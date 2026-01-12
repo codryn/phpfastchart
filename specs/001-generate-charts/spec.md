@@ -1,14 +1,14 @@
 # Feature Specification: 2D Chart Generator with Configurable Rendering
 
 **Created**: 2026-01-12  
-**Status**: Draft  
+**Status**: Draft (Updated: 2026-01-12 - Added SVG support)  
 **Constitutional Compliance**: ✅ All principles applicable
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Generate Basic Chart Image (Priority: P1) 🎯 MVP
 
-A developer needs to generate a simple chart image (PNG or WEBP) with data points and save it to disk.
+A developer needs to generate a simple chart image (PNG, WEBP, or SVG) with data points and save it to disk.
 
 **Why this priority**: Core chart generation capability - without this, no other features matter. This delivers immediate value: working chart output.
 
@@ -18,7 +18,8 @@ A developer needs to generate a simple chart image (PNG or WEBP) with data point
 
 1. **Given** chart data and configuration, **When** user calls `generate()` with PNG format, **Then** valid PNG file is created with correct dimensions
 2. **Given** chart data and configuration, **When** user calls `generate()` with WEBP format, **Then** valid WEBP file is created with correct dimensions
-3. **Given** invalid image format, **When** user calls `generate()`, **Then** descriptive exception is thrown with valid format list
+3. **Given** chart data and configuration, **When** user calls `generate()` with SVG format, **Then** valid SVG file is created with correct dimensions and scalable vector content
+4. **Given** invalid image format, **When** user calls `generate()`, **Then** descriptive exception is thrown with valid format list
 
 ---
 
@@ -146,31 +147,32 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 - **FR-001**: Library MUST generate PNG format images
 - **FR-002**: Library MUST generate WEBP format images
-- **FR-003**: Library MUST support configurable image width and height (in pixels)
-- **FR-004**: Library MUST allow setting background color including full transparency
-- **FR-005**: Library MUST allow setting axis line colors
-- **FR-006**: Library MUST allow setting data line colors for each series
-- **FR-007**: Library MUST allow setting area fill colors for each series
-- **FR-008**: Library MUST support horizontal grid lines with configurable spacing
-- **FR-009**: Library MUST support vertical grid lines with configurable spacing
-- **FR-010**: Library MUST allow enabling/disabling grid lines independently per direction
-- **FR-011**: Library MUST support configurable grid line styling (color, width)
-- **FR-012**: Library MUST support axis labels (text for X and Y axes)
-- **FR-013**: Library MUST support data point labels
-- **FR-014**: Library MUST support configurable legend showing data series with colors
-- **FR-015**: Library MUST support legend positioning
-- **FR-016**: Library MUST support Bar chart type
-- **FR-017**: Library MUST support Line chart type
-- **FR-018**: Library MUST support Pie chart type
-- **FR-019**: Library MUST support Scatter chart type
-- **FR-020**: Library MUST support Radar chart type
-- **FR-021**: Library MUST allow configurable X-axis scaling (min, max, auto)
-- **FR-022**: Library MUST allow configurable Y-axis scaling (min, max, auto)
-- **FR-023**: Library MUST validate input data and throw descriptive exceptions for invalid input
-- **FR-024**: All public APIs MUST have complete PHPDoc documentation
-- **FR-025**: All files MUST include `declare(strict_types=1)`
-- **FR-026**: All code MUST pass PHPStan level 10 with strict rules
-- **FR-027**: All code MUST be PSR-12 compliant
+- **FR-003**: Library MUST generate SVG format images (scalable vector graphics)
+- **FR-004**: Library MUST support configurable image width and height (in pixels for raster, viewBox for SVG)
+- **FR-005**: Library MUST allow setting background color including full transparency
+- **FR-006**: Library MUST allow setting axis line colors
+- **FR-007**: Library MUST allow setting data line colors for each series
+- **FR-008**: Library MUST allow setting area fill colors for each series
+- **FR-009**: Library MUST support horizontal grid lines with configurable spacing
+- **FR-010**: Library MUST support vertical grid lines with configurable spacing
+- **FR-011**: Library MUST allow enabling/disabling grid lines independently per direction
+- **FR-012**: Library MUST support configurable grid line styling (color, width)
+- **FR-013**: Library MUST support axis labels (text for X and Y axes)
+- **FR-014**: Library MUST support data point labels
+- **FR-015**: Library MUST support configurable legend showing data series with colors
+- **FR-016**: Library MUST support legend positioning
+- **FR-017**: Library MUST support Bar chart type
+- **FR-018**: Library MUST support Line chart type
+- **FR-019**: Library MUST support Pie chart type
+- **FR-020**: Library MUST support Scatter chart type
+- **FR-021**: Library MUST support Radar chart type
+- **FR-022**: Library MUST allow configurable X-axis scaling (min, max, auto)
+- **FR-023**: Library MUST allow configurable Y-axis scaling (min, max, auto)
+- **FR-024**: Library MUST validate input data and throw descriptive exceptions for invalid input
+- **FR-025**: All public APIs MUST have complete PHPDoc documentation
+- **FR-026**: All files MUST include `declare(strict_types=1)`
+- **FR-027**: All code MUST pass PHPStan level 10 with strict rules
+- **FR-028**: All code MUST be PSR-12 compliant
 
 ### Key Entities *(feature involves data)*
 
@@ -190,7 +192,7 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 - **ColorConfiguration**: Holds all color settings. Attributes include background color, axis color, grid color, series-specific colors (mapping of series name to colors).
 
-- **ImageConfiguration**: Output image settings. Attributes include width (pixels), height (pixels), format (PNG/WEBP), quality (for WEBP).
+- **ImageConfiguration**: Output image settings. Attributes include width (pixels for raster, viewBox width for SVG), height (pixels for raster, viewBox height for SVG), format (PNG/WEBP/SVG), quality (for WEBP).
 
 ## Success Criteria *(mandatory)*
 
@@ -198,20 +200,20 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 - **SC-001**: Developers can generate a basic chart with default settings in fewer than 10 lines of code
 - **SC-002**: Library can generate charts with up to 1,000 data points in under 1 second on standard hardware
-- **SC-003**: Generated images are valid and can be opened in standard image viewers and browsers
-- **SC-004**: All five chart types (Bar, Line, Pie, Scatter, Radar) are fully functional with complete API
+- **SC-003**: Generated images (PNG, WEBP, SVG) are valid and can be opened in standard image viewers and browsers
+- **SC-004**: All five chart types (Bar, Line, Pie, Scatter, Radar) are fully functional with complete API for all three output formats
 - **SC-005**: Test coverage is at least 80% for all chart generation code
 - **SC-006**: Zero PHPStan level 10 errors with strict rules enabled
 - **SC-007**: Documentation includes working examples for each chart type
 - **SC-008**: Library works identically on PHP 8.1, 8.2, 8.3, 8.4, and 8.5
-- **SC-009**: Chart generation uses zero runtime dependencies beyond PHP's GD or Imagick extensions
+- **SC-009**: Chart generation uses zero runtime dependencies beyond PHP's GD extension (for raster formats) - SVG uses pure PHP string generation
 - **SC-010**: All public methods have complete PHPDoc blocks with @param, @return, and @throws tags
 
 ## Assumptions *(documenting defaults)*
 
-1. **Image Library**: Will use PHP's GD extension (standard with PHP) for image generation. GD supports PNG and WEBP formats required.
+1. **Image Library**: Will use PHP's GD extension (standard with PHP) for raster image generation (PNG, WEBP). SVG format uses pure PHP string generation to produce XML markup - no external library needed.
 
-2. **Color Format**: Colors specified as hex strings ("#RRGGBB" or "#RRGGBBAA" for transparency) or named colors ("red", "blue", etc.).
+2. **Color Format**: Colors specified as hex strings ("#RRGGBB" or "#RRGGBBAA" for transparency) or named colors ("red", "blue", etc.). SVG naturally supports all CSS color formats.
 
 3. **Coordinate System**: Standard Cartesian coordinate system with origin at bottom-left for Bar, Line, Scatter charts. Radar uses polar coordinates.
 
@@ -232,9 +234,9 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 ## Non-Requirements *(explicitly out of scope)*
 
 - **3D Charts**: Only 2D charts supported in this specification
-- **Animation**: Static images only, no animated charts
-- **Interactive Features**: No hover effects, clickable elements, or JavaScript interactivity
-- **SVG Output**: Only raster formats (PNG, WEBP), no vector formats
+- **Animation**: Static images only, no animated SVG or animated charts
+- **Interactive Features**: No hover effects, clickable elements, or JavaScript interactivity in SVG output
+- **Advanced Vector Features**: No gradients, patterns, filters, or complex SVG effects beyond basic shapes and paths
 - **Real-time Updates**: Charts are generated on-demand, not updated in real-time
 - **Chart Templates**: No predefined visual themes or templates
 - **Data Import**: Library does not parse CSV, Excel, or database sources - data must be provided as PHP arrays
@@ -245,8 +247,9 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 ## Dependencies *(constitutional requirement: zero runtime dependencies)*
 
 ### Runtime Dependencies
-- **PHP GD Extension**: Required for image generation (standard with PHP, not a Composer dependency)
+- **PHP GD Extension**: Required for raster image generation (PNG, WEBP) - standard with PHP, not a Composer dependency
 - **PHP**: Version 8.1+ (constitutional requirement)
+- **SVG Generation**: Pure PHP implementation, no external dependencies
 
 ### Development Dependencies
 - **PHPUnit**: 10.5+ for testing
