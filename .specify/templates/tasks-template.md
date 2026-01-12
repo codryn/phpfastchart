@@ -20,10 +20,10 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **PHP Library**: `src/`, `tests/`, `examples/` at repository root
+- **Test structure**: `tests/Unit/`, `tests/Integration/`, `tests/Fixtures/`
+- **Namespaces**: Follow PSR-4 autoloading (e.g., `Codryn\PHPFastChart\Feature`)
+- Paths shown below assume PHP library structure - adjust based on plan.md if needed
 
 <!-- 
   ============================================================================
@@ -46,11 +46,13 @@ description: "Task list template for feature implementation"
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Project initialization and basic structure
+**Purpose**: Project initialization and basic structure per PHPFastChart constitution
 
 - [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T002 [P] Add `declare(strict_types=1)` to all new PHP files
+- [ ] T003 [P] Configure PHPStan 2.1 with level 10 and strict rules
+- [ ] T004 [P] Configure PHP-CS-Fixer with PSR-12 rules
+- [ ] T005 Update composer.json if new autoload namespaces needed
 
 ---
 
@@ -62,12 +64,10 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T006 Create base exception classes in src/Exception/
+- [ ] T007 [P] Setup shared interfaces or abstract classes
+- [ ] T008 [P] Create test fixtures or test data builders in tests/Fixtures/
+- [ ] T009 [P] Setup test base classes if needed (e.g., TestCase extensions)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -81,19 +81,24 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> **NOTE: Write these tests FIRST, ensure they FAIL before implementation (TDD: RED phase)**
+> **Constitution requires TDD: Tests → Approval → Verify Failure → Implement**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Unit test for [Entity] in tests/Unit/[Feature]/[Entity]Test.php
+- [ ] T011 [P] [US1] Integration test for [Service] in tests/Integration/[Feature]/[Service]Test.php
+- [ ] T012 [P] [US1] Verify tests FAIL (RED phase) before implementation
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T013 [P] [US1] Create [Entity].php with strict types and complete PHPDoc in src/[Feature]/
+- [ ] T014 [P] [US1] Create [Service].php with strict types and complete PHPDoc in src/[Feature]/
+- [ ] T015 [US1] Implement business logic to pass tests (GREEN phase)
+- [ ] T016 [US1] Refactor while keeping tests green (REFACTOR phase)
+- [ ] T017 [US1] Run PHPStan level 10 - fix any errors
+- [ ] T018 [US1] Run PHP-CS-Fixer - fix any PSR-12 violations
+- [ ] T019 [US1] Verify test coverage >= 80% for new code
+- [ ] T020 [US1] Create usage example in examples/[feature]-example.php
+- [ ] T021 [US1] Update README.md with new feature documentation
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

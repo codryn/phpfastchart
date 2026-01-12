@@ -64,29 +64,36 @@ specs/[###-feature]/
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
   for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  real paths. The delivered plan must not include Option labels.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+# [REMOVE IF UNUSED] Option 1: PHP Library (DEFAULT for PHPFastChart)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── [Feature]/           # Feature namespace
+│   ├── [Entity].php     # Data models/entities
+│   ├── [Service].php    # Business logic
+│   └── [Exception].php  # Custom exceptions
+└── [Shared]/            # Shared utilities
 
 tests/
-├── contract/
-├── integration/
-└── unit/
+├── Unit/
+│   └── [Feature]/
+│       └── [Entity]Test.php
+├── Integration/
+│   └── [Feature]/
+│       └── [Service]Test.php
+└── Fixtures/            # Test data
+
+examples/
+└── [feature]-example.php
 
 # [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
 backend/
 ├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
+│   ├── Controller/
+│   ├── Service/
+│   └── Entity/
 └── tests/
 
 frontend/
@@ -95,13 +102,6 @@ frontend/
 │   ├── pages/
 │   └── services/
 └── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
