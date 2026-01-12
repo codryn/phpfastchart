@@ -25,13 +25,13 @@
 
 **Purpose**: Project initialization and basic structure per PHPFastChart constitution
 
-- [ ] T001 Create directory structure: src/{Chart,Data,Configuration,Renderer,Exception,Util}
-- [ ] T002 Create directory structure: tests/{Unit,Integration,Fixtures}
-- [ ] T003 Create directory structure: examples/
-- [ ] T004 [P] Update composer.json with PSR-4 autoloading for Codryn\PHPFastChart namespace
-- [ ] T005 [P] Verify PHPStan configuration at phpstan.neon (level 10, strict rules)
-- [ ] T006 [P] Verify PHP-CS-Fixer configuration for PSR-12
-- [ ] T007 [P] Verify PHPUnit configuration at phpunit.xml
+- [X] T001 Create directory structure: src/{Chart,Data,Configuration,Renderer,Exception,Util}
+- [X] T002 Create directory structure: tests/{Unit,Integration,Fixtures}
+- [X] T003 Create directory structure: examples/
+- [X] T004 [P] Update composer.json with PSR-4 autoloading for Codryn\PHPFastChart namespace
+- [X] T005 [P] Verify PHPStan configuration at phpstan.neon (level 10, strict rules)
+- [X] T006 [P] Verify PHP-CS-Fixer configuration for PSR-12
+- [X] T007 [P] Verify PHPUnit configuration at phpunit.xml
 
 ---
 
@@ -41,24 +41,24 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 [P] Write test for ChartException base class in tests/Unit/Exception/ChartExceptionTest.php
-- [ ] T009 [P] Create ChartException.php with strict types and PHPDoc in src/Exception/
-- [ ] T010 [P] Write test for InvalidArgumentException in tests/Unit/Exception/InvalidArgumentExceptionTest.php
-- [ ] T011 [P] Create InvalidArgumentException.php in src/Exception/
-- [ ] T012 [P] Write test for InvalidConfigurationException in tests/Unit/Exception/InvalidConfigurationExceptionTest.php
-- [ ] T013 [P] Create InvalidConfigurationException.php in src/Exception/
-- [ ] T014 [P] Write test for RenderException in tests/Unit/Exception/RenderExceptionTest.php
-- [ ] T015 [P] Create RenderException.php in src/Exception/
-- [ ] T016 [P] Write test for ChartType enum in tests/Unit/Chart/ChartTypeTest.php
-- [ ] T017 [P] Create ChartType.php enum with all 5 types in src/Chart/
-- [ ] T018 [P] Write test for ImageFormat enum in tests/Unit/Configuration/ImageFormatTest.php
-- [ ] T019 [P] Create ImageFormat.php enum (PNG, WEBP, SVG) in src/Configuration/
-- [ ] T020 [P] Write test for ColorParser utility in tests/Unit/Util/ColorParserTest.php
-- [ ] T021 [P] Create ColorParser.php with hex and named color parsing in src/Util/
-- [ ] T022 [P] Write test for Validator utility in tests/Unit/Util/ValidatorTest.php
-- [ ] T023 [P] Create Validator.php with dimension, color, range validation in src/Util/
-- [ ] T024 Run PHPStan and PHP-CS-Fixer on foundational code, fix all issues
-- [ ] T025 Verify all foundational tests pass and coverage >= 80%
+- [X] T008 [P] Write test for ChartException base class in tests/Unit/Exception/ChartExceptionTest.php
+- [X] T009 [P] Create ChartException.php with strict types and PHPDoc in src/Exception/
+- [X] T010 [P] Write test for InvalidArgumentException in tests/Unit/Exception/InvalidArgumentExceptionTest.php
+- [X] T011 [P] Create InvalidArgumentException.php in src/Exception/
+- [X] T012 [P] Write test for InvalidConfigurationException in tests/Unit/Exception/InvalidConfigurationExceptionTest.php
+- [X] T013 [P] Create InvalidConfigurationException.php in src/Exception/
+- [X] T014 [P] Write test for RenderException in tests/Unit/Exception/RenderExceptionTest.php
+- [X] T015 [P] Create RenderException.php in src/Exception/
+- [X] T016 [P] Write test for ChartType enum in tests/Unit/Chart/ChartTypeTest.php
+- [X] T017 [P] Create ChartType.php enum with all 5 types in src/Chart/
+- [X] T018 [P] Write test for ImageFormat enum in tests/Unit/Configuration/ImageFormatTest.php
+- [X] T019 [P] Create ImageFormat.php enum (PNG, WEBP, SVG) in src/Configuration/
+- [X] T020 [P] Write test for ColorParser utility in tests/Unit/Util/ColorParserTest.php
+- [X] T021 [P] Create ColorParser.php with hex and named color parsing in src/Util/
+- [X] T022 [P] Write test for Validator utility in tests/Unit/Util/ValidatorTest.php
+- [X] T023 [P] Create Validator.php with dimension, color, range validation in src/Util/
+- [X] T024 Run PHPStan and PHP-CS-Fixer on foundational code, fix all issues
+- [X] T025 Verify all foundational tests pass and coverage >= 80%
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -72,39 +72,39 @@
 
 ### Tests for User Story 1 (TDD: Write tests FIRST)
 
-- [ ] T026 [P] [US1] Write test for DataPoint creation and immutability in tests/Unit/Data/DataPointTest.php
-- [ ] T027 [P] [US1] Write test for DataSeries creation with validation in tests/Unit/Data/DataSeriesTest.php  
+- [X] T026 [P] [US1] Write test for DataPoint creation and immutability in tests/Unit/Data/DataPointTest.php
+- [X] T027 [P] [US1] Write test for DataSeries creation with validation in tests/Unit/Data/DataSeriesTest.php  
 - [ ] T028 [P] [US1] Write test for DataCollection management in tests/Unit/Data/DataCollectionTest.php
 - [ ] T029 [P] [US1] Write test for Chart construction and size validation in tests/Unit/Chart/ChartTest.php
 - [ ] T030 [P] [US1] Write test for RendererInterface contract in tests/Unit/Renderer/RendererInterfaceTest.php
 - [ ] T031 [P] [US1] Write test for RasterRenderer (GD) in tests/Unit/Renderer/RasterRendererTest.php
 - [ ] T032 [P] [US1] Write test for SvgRenderer in tests/Unit/Renderer/SvgRendererTest.php
-- [ ] T033 [US1] Write integration test for PNG generation in tests/Integration/ChartGenerationTest.php
+- [X] T033 [US1] Write integration test for PNG generation in tests/Integration/ChartGenerationTest.php
 - [ ] T034 [US1] Write integration test for WEBP generation in tests/Integration/ChartGenerationTest.php
-- [ ] T035 [US1] Write integration test for SVG generation in tests/Integration/ChartGenerationTest.php
-- [ ] T036 [US1] Verify all US1 tests FAIL (RED phase confirmed)
+- [X] T035 [US1] Write integration test for SVG generation in tests/Integration/ChartGenerationTest.php
+- [X] T036 [US1] Verify all US1 tests FAIL (RED phase confirmed)
 
 ### Implementation for User Story 1
 
-- [ ] T037 [P] [US1] Implement DataPoint.php with readonly properties and strict types in src/Data/
-- [ ] T038 [P] [US1] Implement DataSeries.php with immutable deep copy in src/Data/
+- [X] T037 [P] [US1] Implement DataPoint.php with readonly properties and strict types in src/Data/
+- [X] T038 [P] [US1] Implement DataSeries.php with immutable deep copy in src/Data/
 - [ ] T039 [P] [US1] Implement DataCollection.php with add/get methods in src/Data/
-- [ ] T040 [US1] Implement Chart.php with fluent interface methods in src/Chart/
+- [X] T040 [US1] Implement Chart.php with fluent interface methods in src/Chart/
 - [ ] T041 [US1] Implement RendererInterface.php contract in src/Renderer/
 - [ ] T042 [US1] Implement RasterRenderer.php using GD for PNG/WEBP in src/Renderer/
-- [ ] T043 [US1] Implement SvgRenderer.php with pure PHP XML generation in src/Renderer/
-- [ ] T044 [US1] Implement basic LineChartRenderer.php in src/Renderer/ChartRenderer/
-- [ ] T045 [US1] Implement Chart->generate() method with file output
-- [ ] T046 [US1] Implement Chart->render() method returning string
-- [ ] T047 [US1] Run all US1 tests - verify they PASS (GREEN phase)
-- [ ] T048 [US1] Refactor US1 code for clarity while keeping tests green (REFACTOR phase)
-- [ ] T049 [US1] Run PHPStan level 10 - fix any errors
-- [ ] T050 [US1] Run PHP-CS-Fixer - fix PSR-12 violations
+- [X] T043 [US1] Implement SvgRenderer.php with pure PHP XML generation in src/Renderer/
+- [X] T044 [US1] Implement basic LineChartRenderer.php in src/Renderer/ChartRenderer/
+- [X] T045 [US1] Implement Chart->generate() method with file output
+- [X] T046 [US1] Implement Chart->render() method returning string
+- [X] T047 [US1] Run all US1 tests - verify they PASS (GREEN phase)
+- [X] T048 [US1] Refactor US1 code for clarity while keeping tests green (REFACTOR phase)
+- [X] T049 [US1] Run PHPStan level 10 - fix any errors
+- [X] T050 [US1] Run PHP-CS-Fixer - fix PSR-12 violations
 - [ ] T051 [US1] Verify coverage >= 80% for US1 code
-- [ ] T052 [US1] Create basic-line-chart.php example in examples/
-- [ ] T053 [US1] Update README.md with basic usage example
+- [X] T052 [US1] Create basic-line-chart.php example in examples/
+- [X] T053 [US1] Update README.md with basic usage example
 
-**Checkpoint**: User Story 1 complete - basic chart generation working for all 3 formats
+**Checkpoint**: User Story 1 MVP complete - basic SVG line chart generation working
 
 ---
 

@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Codryn\\PHPDice\\": "src/"
+            "Codryn\\PHPFastChart\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Codryn\\PHPDice\\Tests\\": "tests/"
+            "Codryn\\PHPFastChart\\Tests\\": "tests/"
         }
     },
     "scripts": {
