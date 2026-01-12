@@ -12,6 +12,8 @@
 
 ## Features
 - **📊 Multiple Chart Types**: Bar, Line, Pie, Scatter, and Radar.
+- **🎨 Customizable**: Colors, labels, legends, and styles
+- **🖼️ Image Export**: PNG, WEBP, SVG format
 - **❗ Error Handling**: Clear, specific error messages with location information
 - **🚀 High Performance**: Fast chart generation
 - **🔒 Type Safe**: Full PHP 8.1+ type declarations and strict mode
@@ -35,16 +37,18 @@ composer require codryn/phpfastchart
 <?php
 require 'vendor/autoload.php';
 
-use Codryn\PHPFastChart\PHPFastChart;
+use Codryn\PHPFastChart\FastChart;
 
 // Create instance
-$chart = new PHPFastChart();
+$chart = new FastChart();
 
 // TODO: Add chart creation and rendering code here
 ```
 
 ## Documentation
 
+- **[Feature Specification](docs/CHART_GENERATOR_SPEC.md)** - Complete specification for chart generator features
+- **[Constitution](.specify/memory/constitution.md)** - Project quality standards and development principles
 - **[Examples](examples/)** - Chart specific examples
 
 ## Development
