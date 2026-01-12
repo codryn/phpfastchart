@@ -70,7 +70,8 @@ A developer needs to control axis ranges and scaling to properly display their d
 1. **Given** explicit Y-axis min/max values, **When** chart is generated, **Then** Y-axis uses specified range
 2. **Given** explicit X-axis min/max values, **When** chart is generated, **Then** X-axis uses specified range
 3. **Given** no explicit range, **When** chart is generated, **Then** axes auto-scale to fit data
-4. **Given** data outside specified range, **When** chart is generated, **Then** out-of-range data is clipped or throws exception
+4. **Given** data outside specified range and default settings, **When** chart is generated, **Then** InvalidArgumentException is thrown
+5. **Given** data outside specified range and clip mode enabled, **When** chart is generated, **Then** out-of-range data is clipped silently
 
 ---
 
@@ -131,8 +132,8 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 ### Edge Cases
 
-- What happens when image dimensions are too small (e.g., 1x1 pixels)?
-- How does system handle empty datasets (no data points)?
+- What happens when image dimensions are too small (e.g., 1x1 pixels)? **[CLARIFIED: Minimum 50x50 pixels enforced, throws InvalidArgumentException if smaller]**
+- How does system handle empty datasets (no data points)? **[CLARIFIED: Throws InvalidArgumentException]**
 - What happens with extremely large datasets (10,000+ points)?
 - How are negative values handled in charts that don't support them (e.g., Pie)?
 - What happens when colors are specified in invalid formats?
@@ -149,6 +150,7 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 - **FR-002**: Library MUST generate WEBP format images
 - **FR-003**: Library MUST generate SVG format images (scalable vector graphics)
 - **FR-004**: Library MUST support configurable image width and height (in pixels for raster, viewBox for SVG)
+- **FR-004a**: Library MUST enforce minimum dimensions of 50x50 pixels and throw InvalidArgumentException for smaller values
 - **FR-005**: Library MUST allow setting background color including full transparency
 - **FR-006**: Library MUST allow setting axis line colors
 - **FR-007**: Library MUST allow setting data line colors for each series
@@ -169,6 +171,7 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 - **FR-022**: Library MUST allow configurable X-axis scaling (min, max, auto)
 - **FR-023**: Library MUST allow configurable Y-axis scaling (min, max, auto)
 - **FR-024**: Library MUST validate input data and throw descriptive exceptions for invalid input
+- **FR-024a**: Library MUST throw InvalidArgumentException when attempting to generate chart with empty dataset (no data points)
 - **FR-025**: All public APIs MUST have complete PHPDoc documentation
 - **FR-026**: All files MUST include `declare(strict_types=1)`
 - **FR-027**: All code MUST pass PHPStan level 10 with strict rules
@@ -180,11 +183,11 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 - **ChartType**: Enumeration of supported types (Bar, Line, Pie, Scatter, Radar). Each type has different rendering logic.
 
-- **DataSeries**: Represents a single series of data points. Attributes include name/label, data points array, line color, fill color, visibility.
+- **DataSeries**: Represents a single series of data points. Attributes include name/label, data points array (immutable copy), line color, fill color, visibility. Data is cloned on construction to prevent external modifications.
 
 - **DataPoint**: Represents a single data point. Attributes include X value, Y value (optional for pie charts), label.
 
-- **Axis**: Represents an axis (X or Y). Attributes include label, min value, max value, auto-scale flag, color, tick interval.
+- **Axis**: Represents an axis (X or Y). Attributes include label, min value, max value, auto-scale flag, color, tick interval, clip mode (throw exception or clip silently when data exceeds range).
 
 - **GridConfiguration**: Configuration for grid lines. Attributes include horizontal enabled, vertical enabled, spacing/interval, line color, line width.
 
@@ -198,7 +201,7 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 ### Measurable Outcomes
 
-- **SC-001**: Developers can generate a basic chart with default settings in fewer than 10 lines of code
+- **SC-001**: Developers can generate a basic chart with default settings in fewer than 10 lines of code using fluent interface API
 - **SC-002**: Library can generate charts with up to 1,000 data points in under 1 second on standard hardware
 - **SC-003**: Generated images (PNG, WEBP, SVG) are valid and can be opened in standard image viewers and browsers
 - **SC-004**: All five chart types (Bar, Line, Pie, Scatter, Radar) are fully functional with complete API for all three output formats
@@ -217,19 +220,23 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 
 3. **Coordinate System**: Standard Cartesian coordinate system with origin at bottom-left for Bar, Line, Scatter charts. Radar uses polar coordinates.
 
-4. **Default Dimensions**: Default image size is 800x600 pixels if not specified.
+4. **Default Dimensions**: Default image size is 800x600 pixels if not specified. Minimum dimensions are 50x50 pixels - smaller values throw InvalidArgumentException.
 
 5. **Font Handling**: Use GD's built-in fonts for labels and text. Custom font files not required for MVP.
 
 6. **Grid Spacing**: When auto-calculated, grid lines aim for 5-10 divisions per axis.
 
-7. **Data Format**: Data points provided as PHP arrays or objects implementing appropriate interfaces.
+7. **Data Format**: Data points provided as PHP arrays or objects implementing appropriate interfaces. Chart creates internal immutable copies of all data to prevent external modifications from affecting chart output.
 
 8. **Thread Safety**: Not required - PHP requests are typically single-threaded.
 
 9. **Memory Limits**: Assume standard PHP memory limits (128MB+) sufficient for typical chart generation.
 
-10. **Error Handling**: All errors throw typed exceptions with descriptive messages including context about what failed.
+10. **Error Handling**: All errors throw typed exceptions with descriptive messages including context about what failed. By default, data outside explicit axis ranges throws InvalidArgumentException to prevent silent data loss.
+
+11. **API Design**: Fluent interface pattern with chained method calls for configuration. Each setter method returns `$this` for chaining. Validation occurs at generation time, not during configuration.
+
+12. **Data Clipping**: When explicit axis ranges are set, out-of-range data throws exception by default. Users can enable silent clipping mode via configuration if needed.
 
 ## Non-Requirements *(explicitly out of scope)*
 
@@ -280,6 +287,16 @@ A developer needs to generate different chart types (Bar, Line, Pie, Scatter, Ra
 - ✅ **Test Coverage**: >= 80% target set as success criterion
 - ✅ **CI Pipeline**: Tests on all PHP versions included in requirements
 - ✅ **Documentation**: User-facing docs and examples included in success criteria
+
+## Clarifications
+
+### Session 2026-01-12
+
+- Q: Which API style should the chart library use for configuration? → A: Fluent interface - Chained method calls (e.g., `$chart->setWidth(800)->setHeight(600)->setType('line')`)
+- Q: How should data be handled when passed to the chart? → A: Clone/copy - Chart creates internal copy of data (immutable, changes to source don't affect chart)
+- Q: How should out-of-range data be handled when explicit axis ranges are set? → A: Throw exception by default (fail fast with InvalidArgumentException), but add configuration option to allow silent clipping
+- Q: How should empty datasets be handled? → A: Throw exception - InvalidArgumentException when attempting to generate chart with no data points
+- Q: What are the minimum valid image dimensions? → A: 50x50 pixels minimum (ensures basic readability)
 
 ---
 
