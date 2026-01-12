@@ -17,21 +17,34 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: PHP 8.1-8.5 (dev environment: PHP 8.3)
+**Primary Dependencies**: None (zero runtime dependencies - development only: PHPUnit, PHPStan, PHP-CS-Fixer)
+**Storage**: [if applicable, e.g., files, JSON, XML or N/A]
+**Testing**: PHPUnit 10.5+ with >= 80% coverage requirement
+**Target Platform**: [e.g., CLI, Web/CGI, Library only or NEEDS CLARIFICATION]
+**Project Type**: PHP Library (single project structure)
+**Performance Goals**: [domain-specific, e.g., <100ms for 1000 data points or NEEDS CLARIFICATION]
+**Constraints**: Zero runtime dependencies, PSR-12, PHPStan level 10 with strict rules
+**Scale/Scope**: [domain-specific, e.g., support datasets up to X size, Y charts or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+All features MUST comply with PHPFastChart constitution principles:
+
+- [ ] **PHP Compatibility**: Works on PHP 8.1, 8.2, 8.3, 8.4, 8.5
+- [ ] **Zero Dependencies**: No new runtime dependencies (development dependencies OK)
+- [ ] **PHPStan Level 10**: Passes strict rules with zero errors
+- [ ] **PSR-12**: Code style compliant
+- [ ] **Strict Types**: `declare(strict_types=1)` in all files
+- [ ] **TDD**: Tests written and approved before implementation
+- [ ] **PHPDoc**: Complete documentation for all public APIs
+- [ ] **Test Coverage**: >= 80% coverage maintained or improved
+- [ ] **CI Pipeline**: Tests pass on all PHP versions
+- [ ] **Documentation**: User-facing docs updated
+
+**If ANY gate cannot be met**: Document in Complexity Tracking section below
 
 ## Project Structure
 
