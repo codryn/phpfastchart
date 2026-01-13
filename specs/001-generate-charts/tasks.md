@@ -261,23 +261,29 @@
 
 ### Tests for User Story 5
 
-- [ ] T135 [US5] Write test for axis labels in Chart in tests/Unit/Chart/ChartTest.php (extend existing)
-- [ ] T136 [US5] Write integration test for X-axis label in tests/Integration/LabelRenderingTest.php
-- [ ] T137 [US5] Write integration test for Y-axis label in tests/Integration/LabelRenderingTest.php
-- [ ] T138 [US5] Write integration test for chart title in tests/Integration/LabelRenderingTest.php
-- [ ] T139 [US5] Write integration test for data point labels in tests/Integration/LabelRenderingTest.php
-- [ ] T140 [US5] Verify all US5 tests FAIL (RED phase)
+- [X] T135 [US5] Write test for axis labels in Chart in tests/Unit/Chart/ChartTest.php (extend existing)
+- [X] T136 [US5] Write integration test for X-axis label in tests/Integration/LabelRenderingTest.php
+- [X] T137 [US5] Write integration test for Y-axis label in tests/Integration/LabelRenderingTest.php
+- [X] T138 [US5] Write integration test for chart title in tests/Integration/LabelRenderingTest.php
+- [X] T139 [US5] Write integration test for data point labels in tests/Integration/LabelRenderingTest.php
+- [X] T140 [US5] Verify all US5 tests FAIL (RED phase)
 
 ### Implementation for User Story 5
 
-- [ ] T141 [US5] Add setAxisLabel() method to Chart.php
-- [ ] T142 [US5] Add setTitle() method to Chart.php
-- [ ] T143 [US5] Add enableDataLabels() method to Chart.php
-- [ ] T144 [US5] Implement axis label rendering in RasterRenderer.php
-- [ ] T145 [US5] Implement axis label rendering in SvgRenderer.php
-- [ ] T146 [US5] Implement title rendering in renderers
-- [ ] T147 [US5] Implement data point label rendering in chart renderers
-- [ ] T148 [US5] Run all US5 tests - verify PASS (GREEN phase)
+- [X] T141 [US5] Add setAxisLabel() method to Chart.php
+- [X] T142 [US5] Add setTitle() method to Chart.php
+- [X] T143 [US5] Add enableDataLabels() method to Chart.php
+- [ ] T144 [US5] Implement axis label rendering in RasterRenderer.php (deferred - PNG/WEBP)
+- [X] T145 [US5] Implement axis label rendering in SvgRenderer.php
+- [X] T146 [US5] Implement title rendering in renderers
+- [X] T147 [US5] Implement data point label rendering in chart renderers
+- [X] T148 [US5] Run all US5 tests - verify PASS (GREEN phase)
+- [X] T149 [US5] Refactor label code (REFACTOR phase)
+- [X] T150 [US5] Run PHPStan level 10 - fix errors
+- [X] T151 [US5] Run PHP-CS-Fixer - fix violations
+- [X] T152 [US5] Verify coverage >= 80%
+- [X] T153 [US5] Create labels-example.php in examples/
+
 - [ ] T149 [US5] Refactor label code (REFACTOR phase)
 - [ ] T150 [US5] Run PHPStan level 10 - fix errors
 - [ ] T151 [US5] Run PHP-CS-Fixer - fix violations
