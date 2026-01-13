@@ -32,6 +32,10 @@ final class SvgRenderer
      * @param ColorConfiguration $colorConfig Color configuration
      * @param GridConfiguration $gridConfig Grid configuration
      * @param AxisConfiguration $axisConfig Axis configuration
+     * @param string|null $title Chart title
+     * @param string|null $xAxisLabel X-axis label
+     * @param string|null $yAxisLabel Y-axis label
+     * @param bool $dataLabelsEnabled Whether to show data point labels
      * @return string SVG XML content
      */
     public function render(
@@ -39,7 +43,11 @@ final class SvgRenderer
         array $dataSeries,
         ColorConfiguration $colorConfig,
         GridConfiguration $gridConfig,
-        AxisConfiguration $axisConfig
+        AxisConfiguration $axisConfig,
+        ?string $title = null,
+        ?string $xAxisLabel = null,
+        ?string $yAxisLabel = null,
+        bool $dataLabelsEnabled = false
     ): string {
         $svg = sprintf(
             '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">',
@@ -60,10 +68,13 @@ final class SvgRenderer
 
         // Render based on chart type
         match ($type) {
-            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig),
-            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig),
+            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
+            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
             default => $svg .= $this->renderPlaceholder($type),
         };
+
+        // Render labels
+        $svg .= $this->renderLabels($title, $xAxisLabel, $yAxisLabel);
 
         $svg .= '</svg>';
 
@@ -77,7 +88,8 @@ final class SvgRenderer
         array $dataSeries,
         ColorConfiguration $colorConfig,
         GridConfiguration $gridConfig,
-        AxisConfiguration $axisConfig
+        AxisConfiguration $axisConfig,
+        bool $dataLabelsEnabled
     ): string {
         $content = '';
 
@@ -204,6 +216,21 @@ final class SvgRenderer
                 $lineColor['g'],
                 $lineColor['b']
             );
+
+            // Render data labels if enabled
+            if ($dataLabelsEnabled) {
+                foreach ($points as $point) {
+                    $x = $marginLeft + (($point->x - $minX) / $rangeX) * $chartWidth;
+                    $y = $marginTop + $chartHeight - (($point->y - $minY) / $rangeY) * $chartHeight;
+
+                    $content .= sprintf(
+                        '<text x="%.2f" y="%.2f" font-size="12" fill="#333" text-anchor="middle" dy="-8">%g</text>',
+                        $x,
+                        $y,
+                        $point->y
+                    );
+                }
+            }
         }
 
         return $content;
@@ -216,7 +243,8 @@ final class SvgRenderer
         array $dataSeries,
         ColorConfiguration $colorConfig,
         GridConfiguration $gridConfig,
-        AxisConfiguration $axisConfig
+        AxisConfiguration $axisConfig,
+        bool $dataLabelsEnabled
     ): string {
         $content = '';
 
@@ -344,6 +372,19 @@ final class SvgRenderer
                     $barColor['g'],
                     $barColor['b']
                 );
+
+                // Render data label if enabled
+                if ($dataLabelsEnabled) {
+                    $labelX = $x + $barWidth / 2;
+                    $labelY = $y - 5;
+
+                    $content .= sprintf(
+                        '<text x="%.2f" y="%.2f" font-size="12" fill="#333" text-anchor="middle">%g</text>',
+                        $labelX,
+                        $labelY,
+                        $point->y
+                    );
+                }
             }
         }
 
@@ -486,5 +527,44 @@ final class SvgRenderer
                 }
             }
         }
+    }
+
+    /**
+     * Render title and axis labels.
+     */
+    private function renderLabels(?string $title, ?string $xAxisLabel, ?string $yAxisLabel): string
+    {
+        $content = '';
+
+        // Render title at top center
+        if ($title !== null) {
+            $content .= sprintf(
+                '<text x="%d" y="25" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">%s</text>',
+                $this->width / 2,
+                htmlspecialchars($title, ENT_XML1, 'UTF-8')
+            );
+        }
+
+        // Render X-axis label at bottom center
+        if ($xAxisLabel !== null) {
+            $content .= sprintf(
+                '<text x="%d" y="%d" font-size="14" fill="#666" text-anchor="middle">%s</text>',
+                $this->width / 2,
+                $this->height - 10,
+                htmlspecialchars($xAxisLabel, ENT_XML1, 'UTF-8')
+            );
+        }
+
+        // Render Y-axis label on left side (rotated)
+        if ($yAxisLabel !== null) {
+            $content .= sprintf(
+                '<text x="15" y="%d" font-size="14" fill="#666" text-anchor="middle" transform="rotate(-90 15 %d)">%s</text>',
+                $this->height / 2,
+                $this->height / 2,
+                htmlspecialchars($yAxisLabel, ENT_XML1, 'UTF-8')
+            );
+        }
+
+        return $content;
     }
 }

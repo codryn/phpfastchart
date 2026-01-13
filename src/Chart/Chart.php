@@ -25,6 +25,10 @@ final class Chart
     private ColorConfiguration $colorConfig;
     private GridConfiguration $gridConfig;
     private AxisConfiguration $axisConfig;
+    private ?string $title = null;
+    private ?string $xAxisLabel = null;
+    private ?string $yAxisLabel = null;
+    private bool $dataLabelsEnabled = false;
 
     /** @var array<DataSeries> */
     private array $dataSeries = [];
@@ -160,6 +164,42 @@ final class Chart
     }
 
     /**
+     * Set chart title.
+     */
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * Set X-axis label.
+     */
+    public function setXAxisLabel(string $label): self
+    {
+        $this->xAxisLabel = $label;
+        return $this;
+    }
+
+    /**
+     * Set Y-axis label.
+     */
+    public function setYAxisLabel(string $label): self
+    {
+        $this->yAxisLabel = $label;
+        return $this;
+    }
+
+    /**
+     * Enable data point labels.
+     */
+    public function enableDataLabels(bool $enabled = true): self
+    {
+        $this->dataLabelsEnabled = $enabled;
+        return $this;
+    }
+
+    /**
      * Generate chart and save to file.
      *
      * @param string $outputPath Output file path
@@ -197,7 +237,11 @@ final class Chart
             $this->dataSeries,
             $this->colorConfig,
             $this->gridConfig,
-            $this->axisConfig
+            $this->axisConfig,
+            $this->title,
+            $this->xAxisLabel,
+            $this->yAxisLabel,
+            $this->dataLabelsEnabled
         );
     }
 }
