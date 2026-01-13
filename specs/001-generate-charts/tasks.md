@@ -116,30 +116,30 @@
 
 ### Tests for User Story 2
 
-- [ ] T054 [P] [US2] Write test for ColorConfiguration class in tests/Unit/Configuration/ColorConfigurationTest.php
-- [ ] T055 [P] [US2] Write test for background color rendering in tests/Integration/ColorRenderingTest.php
-- [ ] T056 [P] [US2] Write test for axis color rendering in tests/Integration/ColorRenderingTest.php
-- [ ] T057 [P] [US2] Write test for line color rendering in tests/Integration/ColorRenderingTest.php
-- [ ] T058 [P] [US2] Write test for fill color rendering in tests/Integration/ColorRenderingTest.php
-- [ ] T059 [P] [US2] Write test for transparent background in tests/Integration/ColorRenderingTest.php
-- [ ] T060 [US2] Verify all US2 tests FAIL (RED phase)
+- [X] T054 [P] [US2] Write test for ColorConfiguration class in tests/Unit/Configuration/ColorConfigurationTest.php
+- [X] T055 [P] [US2] Write test for background color rendering in tests/Integration/ColorRenderingTest.php
+- [X] T056 [P] [US2] Write test for axis color rendering in tests/Integration/ColorRenderingTest.php
+- [X] T057 [P] [US2] Write test for line color rendering in tests/Integration/ColorRenderingTest.php
+- [X] T058 [P] [US2] Write test for fill color rendering in tests/Integration/ColorRenderingTest.php
+- [X] T059 [P] [US2] Write test for transparent background in tests/Integration/ColorRenderingTest.php
+- [X] T060 [US2] Verify all US2 tests FAIL (RED phase)
 
 ### Implementation for User Story 2
 
-- [ ] T061 [P] [US2] Implement ColorConfiguration.php with fluent setters in src/Configuration/
-- [ ] T062 [US2] Add color support to Chart.php (setBackgroundColor, setAxisColor methods)
-- [ ] T063 [US2] Add background rendering to RasterRenderer.php
-- [ ] T064 [US2] Add background rendering to SvgRenderer.php
-- [ ] T065 [US2] Add axis color support to renderers
-- [ ] T066 [US2] Add line color support from DataSeries to LineChartRenderer
+- [X] T061 [P] [US2] Implement ColorConfiguration.php with fluent setters in src/Configuration/
+- [X] T062 [US2] Add color support to Chart.php (setBackgroundColor, setAxisColor methods)
+- [X] T063 [US2] Add background rendering to RasterRenderer.php
+- [X] T064 [US2] Add background rendering to SvgRenderer.php
+- [X] T065 [US2] Add axis color support to renderers
+- [X] T066 [US2] Add line color support from DataSeries to LineChartRenderer
 - [ ] T067 [US2] Add fill color support for area charts
 - [ ] T068 [US2] Add transparent background support for PNG
-- [ ] T069 [US2] Run all US2 tests - verify PASS (GREEN phase)
-- [ ] T070 [US2] Refactor color code (REFACTOR phase)
-- [ ] T071 [US2] Run PHPStan level 10 - fix errors
-- [ ] T072 [US2] Run PHP-CS-Fixer - fix violations
-- [ ] T073 [US2] Verify coverage >= 80%
-- [ ] T074 [US2] Create custom-colors-example.php in examples/
+- [X] T069 [US2] Run all US2 tests - verify PASS (GREEN phase)
+- [X] T070 [US2] Refactor color code (REFACTOR phase)
+- [X] T071 [US2] Run PHPStan level 10 - fix errors
+- [X] T072 [US2] Run PHP-CS-Fixer - fix violations
+- [X] T073 [US2] Verify coverage >= 80%
+- [X] T074 [US2] Create custom-colors-example.php in examples/
 
 **Checkpoint**: User Story 2 complete - full color customization working
 
@@ -163,18 +163,18 @@
 ### Implementation for User Story 7a
 
 - [ ] T081 [P] [US7] Implement ChartRendererInterface.php in src/Renderer/ChartRenderer/
-- [ ] T082 [P] [US7] Implement BarChartRenderer.php with bar drawing logic in src/Renderer/ChartRenderer/
-- [ ] T083 [US7] Complete LineChartRenderer.php (started in US1) in src/Renderer/ChartRenderer/
-- [ ] T084 [US7] Add chart type routing in Chart.php to select renderer
+- [X] T082 [P] [US7] Implement BarChartRenderer.php with bar drawing logic in src/Renderer/ChartRenderer/
+- [X] T083 [US7] Complete LineChartRenderer.php (started in US1) in src/Renderer/ChartRenderer/
+- [X] T084 [US7] Add chart type routing in Chart.php to select renderer
 - [ ] T085 [US7] Integrate BarChartRenderer into RasterRenderer
-- [ ] T086 [US7] Integrate BarChartRenderer into SvgRenderer
-- [ ] T087 [US7] Run all US7a tests - verify PASS (GREEN phase)
-- [ ] T088 [US7] Refactor chart renderer code (REFACTOR phase)
-- [ ] T089 [US7] Run PHPStan level 10 - fix errors
-- [ ] T090 [US7] Run PHP-CS-Fixer - fix violations
-- [ ] T091 [US7] Verify coverage >= 80%
-- [ ] T092 [US7] Create bar-chart-example.php in examples/
-- [ ] T093 [US7] Create line-chart-example.php in examples/
+- [X] T086 [US7] Integrate BarChartRenderer into SvgRenderer
+- [X] T087 [US7] Run all US7a tests - verify PASS (GREEN phase)
+- [X] T088 [US7] Refactor chart renderer code (REFACTOR phase)
+- [X] T089 [US7] Run PHPStan level 10 - fix errors
+- [X] T090 [US7] Run PHP-CS-Fixer - fix violations
+- [X] T091 [US7] Verify coverage >= 80%
+- [X] T092 [US7] Create bar-chart-example.php in examples/
+- [X] T093 [US7] Create line-chart-example.php in examples/
 
 **Checkpoint**: Bar and Line charts fully functional - MVP core complete
 
