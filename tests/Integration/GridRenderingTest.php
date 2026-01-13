@@ -37,7 +37,7 @@ final class GridRenderingTest extends TestCase
         $svg = $chart->render();
 
         $this->assertStringContainsString('<svg', $svg);
-        $this->assertStringContainsString('stroke="#E0E0E0"', $svg);
+        $this->assertStringContainsString('stroke="rgb(224,224,224)"', $svg);
         // Should contain horizontal grid lines (y1 and y2 with same value)
         $this->assertMatchesRegularExpression('/<line[^>]*y1="[0-9.]+"[^>]*y2="[0-9.]+"/', $svg);
     }
@@ -138,7 +138,7 @@ final class GridRenderingTest extends TestCase
         $svg = $chart->render();
 
         $this->assertStringContainsString('<svg', $svg);
-        $this->assertStringContainsString('stroke="#E0E0E0"', $svg);
+        $this->assertStringContainsString('stroke="rgb(224,224,224)"', $svg);
         $this->assertStringContainsString('<rect', $svg); // Bar chart has rectangles
     }
 }

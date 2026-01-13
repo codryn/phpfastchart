@@ -44,7 +44,7 @@ final class SvgRenderer
             $this->width,
             $this->height
         );
-        
+
         // Background
         $bgColor = ColorParser::parse($colorConfig->getBackgroundColor());
         $svg .= sprintf(
@@ -62,7 +62,7 @@ final class SvgRenderer
         };
 
         $svg .= '</svg>';
-        
+
         return $svg;
     }
 
@@ -123,7 +123,7 @@ final class SvgRenderer
         $maxX = $allPoints[0]->x;
         $minY = $allPoints[0]->y;
         $maxY = $allPoints[0]->y;
-        
+
         foreach ($allPoints as $point) {
             $minX = min($minX, $point->x);
             $maxX = max($maxX, $point->x);
@@ -163,20 +163,20 @@ final class SvgRenderer
             if (count($points) === 0) {
                 continue;
             }
-            
+
             // Build path using global bounds
             $pathData = '';
             foreach ($points as $i => $point) {
                 $x = $marginLeft + (($point->x - $minX) / $rangeX) * $chartWidth;
                 $y = $marginTop + $chartHeight - (($point->y - $minY) / $rangeY) * $chartHeight;
-                
+
                 $pathData .= ($i === 0 ? 'M' : 'L') . " {$x},{$y} ";
             }
-            
+
             // Use series color or default
             $color = $series->getLineColor() ?? '#3498db';
             $lineColor = ColorParser::parse($color);
-            
+
             $content .= sprintf(
                 '<path d="%s" fill="none" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
                 trim($pathData),
@@ -185,7 +185,7 @@ final class SvgRenderer
                 $lineColor['b']
             );
         }
-        
+
         return $content;
     }
 
@@ -236,65 +236,54 @@ final class SvgRenderer
             $allPoints = array_merge($allPoints, $series->getPoints());
         }
 
-        if (count($allPoints) > 0) {
-            // Find min/max for scaling
-            $minY = $allPoints[0]->y;
-            $maxY = $allPoints[0]->y;
-            $minX = $allPoints[0]->x;
-            $maxX = $allPoints[0]->x;
-
-            foreach ($allPoints as $point) {
-                $minY = min($minY, $point->y);
-                $maxY = max($maxY, $point->y);
-                $minX = min($minX, $point->x);
-                $maxX = max($maxX, $point->x);
-            }
-
-            $rangeY = $maxY - $minY;
-            $rangeX = $maxX - $minX;
-            if ($rangeY === 0.0) {
-                $rangeY = 1.0;
-            }
-            if ($rangeX === 0.0) {
-                $rangeX = 1.0;
-            }
-
-            // Render grid if enabled
-            if ($gridConfig->isEnabled()) {
-                $content .= $this->renderGrid(
-                    $gridConfig,
-                    $marginLeft,
-                    $marginTop,
-                    $chartWidth,
-                    $chartHeight,
-                    $minX,
-                    $maxX,
-                    $minY,
-                    $maxY,
-                    $rangeX,
-                    $rangeY
-                );
-            }
+        if (count($allPoints) === 0) {
+            return $content;
         }
 
+        // Find min/max for scaling
+        $minY = $allPoints[0]->y;
+        $maxY = $allPoints[0]->y;
+        $minX = $allPoints[0]->x;
+        $maxX = $allPoints[0]->x;
+
+        foreach ($allPoints as $point) {
+            $minY = min($minY, $point->y);
+            $maxY = max($maxY, $point->y);
+            $minX = min($minX, $point->x);
+            $maxX = max($maxX, $point->x);
+        }
+
+        $rangeY = $maxY - $minY;
+        $rangeX = $maxX - $minX;
+        if ($rangeY === 0.0) {
+            $rangeY = 1.0;
+        }
+        if ($rangeX === 0.0) {
+            $rangeX = 1.0;
+        }
+
+        // Render grid if enabled
+        if ($gridConfig->isEnabled()) {
+            $content .= $this->renderGrid(
+                $gridConfig,
+                $marginLeft,
+                $marginTop,
+                $chartWidth,
+                $chartHeight,
+                $minX,
+                $maxX,
+                $minY,
+                $maxY,
+                $rangeX,
+                $rangeY
+            );
+        }
+
+        // Render bars for each series using global bounds
         foreach ($dataSeries as $series) {
             $points = $series->getPoints();
             if (count($points) === 0) {
                 continue;
-            }
-
-            // Find min/max for scaling
-            $minY = $points[0]->y;
-            $maxY = $points[0]->y;
-
-            foreach ($points as $point) {
-                $minY = min($minY, $point->y);
-                $maxY = max($maxY, $point->y);
-            }
-
-            $rangeY = $maxY - $minY;
-            if ($rangeY === 0.0) {
-                $rangeY = 1.0;
             }
 
             // Calculate bar width
@@ -342,21 +331,21 @@ final class SvgRenderer
         float $rangeY
     ): string {
         $content = '';
-        
+
         $gridColor = ColorParser::parse($gridConfig->getColor());
         $strokeWidth = $gridConfig->getLineWidth();
-        
+
         // Calculate grid spacing
         $spacing = $gridConfig->getSpacing() ?? MathUtil::calculateGridSpacing($minY, $maxY, $chartHeight);
-        
+
         // Horizontal grid lines (along Y-axis)
         if ($gridConfig->showHorizontalLines()) {
             $yValue = ceil($minY / $spacing) * $spacing;
-            
+
             while ($yValue <= $maxY) {
                 if ($yValue > $minY && $yValue < $maxY) {
                     $yPixel = $marginTop + $chartHeight - (($yValue - $minY) / $rangeY) * $chartHeight;
-                    
+
                     $content .= sprintf(
                         '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="rgb(%d,%d,%d)" stroke-width="%.1f" opacity="0.7" />',
                         $marginLeft,
@@ -369,20 +358,20 @@ final class SvgRenderer
                         $strokeWidth
                     );
                 }
-                
+
                 $yValue += $spacing;
             }
         }
-        
+
         // Vertical grid lines (along X-axis)
         if ($gridConfig->showVerticalLines()) {
             $xSpacing = $gridConfig->getSpacing() ?? MathUtil::calculateGridSpacing($minX, $maxX, $chartWidth);
             $xValue = ceil($minX / $xSpacing) * $xSpacing;
-            
+
             while ($xValue <= $maxX) {
                 if ($xValue > $minX && $xValue < $maxX) {
                     $xPixel = $marginLeft + (($xValue - $minX) / $rangeX) * $chartWidth;
-                    
+
                     $content .= sprintf(
                         '<line x1="%.2f" y1="%d" x2="%.2f" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="%.1f" opacity="0.7" />',
                         $xPixel,
@@ -395,11 +384,11 @@ final class SvgRenderer
                         $strokeWidth
                     );
                 }
-                
+
                 $xValue += $xSpacing;
             }
         }
-        
+
         return $content;
     }
 

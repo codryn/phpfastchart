@@ -15,10 +15,10 @@ final class MathUtil
      * This function calculates a "nice" grid spacing value that produces
      * readable, evenly-spaced grid lines across the chart.
      *
-     * @param float $min          Minimum value in the range
-     * @param float $max          Maximum value in the range
-     * @param int   $pixelSize    Available pixel space for the axis
-     * @return float              Grid spacing in data units
+     * @param float $min Minimum value in the range
+     * @param float $max Maximum value in the range
+     * @param int $pixelSize Available pixel space for the axis
+     * @return float Grid spacing in data units
      */
     public static function calculateGridSpacing(float $min, float $max, int $pixelSize): float
     {

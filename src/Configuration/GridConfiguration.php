@@ -14,12 +14,12 @@ final readonly class GridConfiguration
     /**
      * Create a new grid configuration.
      *
-     * @param bool        $enabled             Whether grid is enabled
-     * @param bool        $showHorizontalLines Whether to show horizontal grid lines
-     * @param bool        $showVerticalLines   Whether to show vertical grid lines
-     * @param string      $color               Grid line color (hex format)
-     * @param float       $lineWidth           Grid line width in pixels
-     * @param float|null  $spacing             Grid spacing in data units (null for auto)
+     * @param bool $enabled Whether grid is enabled
+     * @param bool $showHorizontalLines Whether to show horizontal grid lines
+     * @param bool $showVerticalLines Whether to show vertical grid lines
+     * @param string $color Grid line color (hex format)
+     * @param float $lineWidth Grid line width in pixels
+     * @param float|null $spacing Grid spacing in data units (null for auto)
      */
     public function __construct(
         private bool $enabled = false,
