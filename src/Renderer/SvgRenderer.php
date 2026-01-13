@@ -9,6 +9,8 @@ use Codryn\PHPFastChart\Configuration\AxisClipMode;
 use Codryn\PHPFastChart\Configuration\AxisConfiguration;
 use Codryn\PHPFastChart\Configuration\ColorConfiguration;
 use Codryn\PHPFastChart\Configuration\GridConfiguration;
+use Codryn\PHPFastChart\Configuration\LegendConfiguration;
+use Codryn\PHPFastChart\Configuration\LegendPosition;
 use Codryn\PHPFastChart\Data\DataSeries;
 use Codryn\PHPFastChart\Util\ColorParser;
 use Codryn\PHPFastChart\Util\MathUtil;
@@ -44,6 +46,7 @@ final class SvgRenderer
         ColorConfiguration $colorConfig,
         GridConfiguration $gridConfig,
         AxisConfiguration $axisConfig,
+        LegendConfiguration $legendConfig,
         ?string $title = null,
         ?string $xAxisLabel = null,
         ?string $yAxisLabel = null,
@@ -76,6 +79,11 @@ final class SvgRenderer
 
         // Render labels
         $svg .= $this->renderLabels($title, $xAxisLabel, $yAxisLabel);
+
+        // Render legend
+        if ($legendConfig->isEnabled()) {
+            $svg .= $this->renderLegend($dataSeries, $legendConfig);
+        }
 
         $svg .= '</svg>';
 
@@ -729,4 +737,90 @@ final class SvgRenderer
 
         return $content;
     }
+    /**
+     * Render legend.
+     *
+     * @param array<DataSeries> $dataSeries Data series to show in legend
+     * @param LegendConfiguration $legendConfig Legend configuration
+     * @return string SVG content for legend
+     */
+    private function renderLegend(array $dataSeries, LegendConfiguration $legendConfig): string
+    {
+        $content = '';
+
+        $itemHeight = 20;
+        $itemWidth = 120;
+        $padding = 10;
+        $symbolSize = 12;
+
+        $position = $legendConfig->getPosition();
+        $fontSize = $legendConfig->getFontSize();
+
+        // Parse colors
+        $textColor = ColorParser::parse($legendConfig->getTextColor());
+        $bgColor = ColorParser::parse($legendConfig->getBackgroundColor());
+        $borderColor = ColorParser::parse($legendConfig->getBorderColor());
+
+        // Calculate legend dimensions
+        $legendHeight = count($dataSeries) * $itemHeight + $padding * 2;
+        $legendWidth = $itemWidth + $padding * 2;
+
+        // Determine position
+        [$x, $y] = match ($position) {
+            LegendPosition::Top => [($this->width - $legendWidth) / 2, 10],
+            LegendPosition::Right => [$this->width - $legendWidth - 10, ($this->height - $legendHeight) / 2],
+            LegendPosition::Bottom => [($this->width - $legendWidth) / 2, $this->height - $legendHeight - 10],
+            LegendPosition::Left => [10, ($this->height - $legendHeight) / 2],
+        };
+
+        // Draw legend background
+        $content .= sprintf(
+            '<rect x="%.2f" y="%.2f" width="%d" height="%d" fill="rgb(%d,%d,%d)" stroke="rgb(%d,%d,%d)" stroke-width="1" />',
+            $x,
+            $y,
+            $legendWidth,
+            $legendHeight,
+            $bgColor['r'],
+            $bgColor['g'],
+            $bgColor['b'],
+            $borderColor['r'],
+            $borderColor['g'],
+            $borderColor['b']
+        );
+
+        // Draw legend items
+        $itemY = $y + $padding;
+        foreach ($dataSeries as $series) {
+            $seriesColor = ColorParser::parse($series->getLineColor() ?? '#3498db');
+
+            // Draw color symbol
+            $content .= sprintf(
+                '<rect x="%.2f" y="%.2f" width="%d" height="%d" fill="rgb(%d,%d,%d)" />',
+                $x + $padding,
+                $itemY + ($itemHeight - $symbolSize) / 2,
+                $symbolSize,
+                $symbolSize,
+                $seriesColor['r'],
+                $seriesColor['g'],
+                $seriesColor['b']
+            );
+
+            // Draw series name
+            $content .= sprintf(
+                '<text x="%.2f" y="%.2f" font-size="%d" fill="rgb(%d,%d,%d)" text-anchor="start">%s</text>',
+                $x + $padding + $symbolSize + 8,
+                $itemY + $itemHeight / 2 + $fontSize / 3,
+                $fontSize,
+                $textColor['r'],
+                $textColor['g'],
+                $textColor['b'],
+                htmlspecialchars($series->getName(), ENT_XML1, 'UTF-8')
+            );
+
+            $itemY += $itemHeight;
+        }
+
+        return $content;
+    }
+
 }

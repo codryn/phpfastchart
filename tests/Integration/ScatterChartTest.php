@@ -45,7 +45,7 @@ final class ScatterChartTest extends TestCase
     public function testRenderScatterChartWithMultipleSeries(): void
     {
         $chart = new Chart(ChartType::Scatter);
-        
+
         $series1 = new DataSeries('Group A', [
             new DataPoint(10.0, 20.0),
             new DataPoint(20.0, 30.0),

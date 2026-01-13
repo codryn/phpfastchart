@@ -9,6 +9,8 @@ use Codryn\PHPFastChart\Configuration\AxisConfiguration;
 use Codryn\PHPFastChart\Configuration\ColorConfiguration;
 use Codryn\PHPFastChart\Configuration\GridConfiguration;
 use Codryn\PHPFastChart\Configuration\ImageFormat;
+use Codryn\PHPFastChart\Configuration\LegendConfiguration;
+use Codryn\PHPFastChart\Configuration\LegendPosition;
 use Codryn\PHPFastChart\Data\DataSeries;
 use Codryn\PHPFastChart\Exception\InvalidArgumentException;
 use Codryn\PHPFastChart\Renderer\SvgRenderer;
@@ -25,6 +27,7 @@ final class Chart
     private ColorConfiguration $colorConfig;
     private GridConfiguration $gridConfig;
     private AxisConfiguration $axisConfig;
+    private LegendConfiguration $legendConfig;
     private ?string $title = null;
     private ?string $xAxisLabel = null;
     private ?string $yAxisLabel = null;
@@ -39,6 +42,7 @@ final class Chart
         $this->colorConfig = new ColorConfiguration();
         $this->gridConfig = new GridConfiguration();
         $this->axisConfig = new AxisConfiguration();
+        $this->legendConfig = new LegendConfiguration();
     }
 
     /**
@@ -200,6 +204,76 @@ final class Chart
     }
 
     /**
+     * Enable legend display.
+     *
+     * @return self For method chaining
+     */
+    public function enableLegend(): self
+    {
+        $this->legendConfig = $this->legendConfig->withEnabled(true);
+        return $this;
+    }
+
+    /**
+     * Disable legend display.
+     *
+     * @return self For method chaining
+     */
+    public function disableLegend(): self
+    {
+        $this->legendConfig = $this->legendConfig->withEnabled(false);
+        return $this;
+    }
+
+    /**
+     * Set legend position.
+     *
+     * @param LegendPosition $position Position for the legend
+     * @return self For method chaining
+     */
+    public function setLegendPosition(LegendPosition $position): self
+    {
+        $this->legendConfig = $this->legendConfig->withPosition($position);
+        return $this;
+    }
+
+    /**
+     * Set legend text color.
+     *
+     * @param string $color Color value
+     * @return self For method chaining
+     */
+    public function setLegendTextColor(string $color): self
+    {
+        $this->legendConfig = $this->legendConfig->withTextColor($color);
+        return $this;
+    }
+
+    /**
+     * Set legend background color.
+     *
+     * @param string $color Color value
+     * @return self For method chaining
+     */
+    public function setLegendBackgroundColor(string $color): self
+    {
+        $this->legendConfig = $this->legendConfig->withBackgroundColor($color);
+        return $this;
+    }
+
+    /**
+     * Set legend border color.
+     *
+     * @param string $color Color value
+     * @return self For method chaining
+     */
+    public function setLegendBorderColor(string $color): self
+    {
+        $this->legendConfig = $this->legendConfig->withBorderColor($color);
+        return $this;
+    }
+
+    /**
      * Generate chart and save to file.
      *
      * @param string $outputPath Output file path
@@ -238,6 +312,7 @@ final class Chart
             $this->colorConfig,
             $this->gridConfig,
             $this->axisConfig,
+            $this->legendConfig,
             $this->title,
             $this->xAxisLabel,
             $this->yAxisLabel,
