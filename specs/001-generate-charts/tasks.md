@@ -153,12 +153,12 @@
 
 ### Tests for User Story 7a
 
-- [ ] T075 [P] [US7] Write test for ChartRendererInterface in tests/Unit/Renderer/ChartRenderer/ChartRendererInterfaceTest.php
-- [ ] T076 [P] [US7] Write test for BarChartRenderer in tests/Unit/Renderer/ChartRenderer/BarChartRendererTest.php
-- [ ] T077 [P] [US7] Write test for LineChartRenderer in tests/Unit/Renderer/ChartRenderer/LineChartRendererTest.php
-- [ ] T078 [US7] Write integration test for bar chart in tests/Integration/ChartTypeTest.php
-- [ ] T079 [US7] Write integration test for line chart in tests/Integration/ChartTypeTest.php
-- [ ] T080 [US7] Verify all US7a tests FAIL (RED phase)
+- [X] T075 [P] [US7] Write test for ChartRendererInterface in tests/Unit/Renderer/ChartRenderer/ChartRendererInterfaceTest.php
+- [X] T076 [P] [US7] Write test for BarChartRenderer in tests/Unit/Renderer/ChartRenderer/BarChartRendererTest.php
+- [X] T077 [P] [US7] Write test for LineChartRenderer in tests/Unit/Renderer/ChartRenderer/LineChartRendererTest.php
+- [X] T078 [US7] Write integration test for bar chart in tests/Integration/ChartTypeTest.php
+- [X] T079 [US7] Write integration test for line chart in tests/Integration/ChartTypeTest.php
+- [X] T080 [US7] Verify all US7a tests FAIL (RED phase)
 
 ### Implementation for User Story 7a
 
