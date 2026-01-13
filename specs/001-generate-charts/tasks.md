@@ -202,12 +202,12 @@
 - [X] T102 [US3] Add enableGrid() method to Chart.php
 - [X] T103 [US3] Add setGridStyle() method to Chart.php
 - [ ] T104 [US3] Add grid rendering to RasterRenderer.php (deferred - PNG/WEBP)
-- [ ] T105 [US3] Add grid rendering to SvgRenderer.php (INCOMPLETE - see PHASE6_INCOMPLETE.md)
-- [ ] T106 [US3] Run all US3 tests - verify PASS (GREEN phase)
-- [ ] T107 [US3] Refactor grid code (REFACTOR phase)
-- [ ] T108 [US3] Run PHPStan level 10 - fix errors (1 error remaining)
-- [ ] T109 [US3] Run PHP-CS-Fixer - fix violations
-- [ ] T110 [US3] Verify coverage >= 80%
+- [X] T105 [US3] Add grid rendering to SvgRenderer.php
+- [X] T106 [US3] Run all US3 tests - verify PASS (GREEN phase)
+- [X] T107 [US3] Refactor grid code (REFACTOR phase)
+- [X] T108 [US3] Run PHPStan level 10 - fix errors
+- [X] T109 [US3] Run PHP-CS-Fixer - fix violations
+- [X] T110 [US3] Verify coverage >= 80%
 - [X] T111 [US3] Create grid-lines-example.php in examples/
 
 **Checkpoint**: Grid lines fully functional
