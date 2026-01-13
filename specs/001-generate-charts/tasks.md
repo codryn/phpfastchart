@@ -401,7 +401,7 @@
 - [ ] T206 [P] Create svg-export-example.php in examples/
 - [ ] T207 [P] Update main README.md with complete feature list and usage
 - [ ] T208 [P] Create CONTRIBUTING.md with TDD workflow and quality gates
-- [ ] T209 [P] Create CHANGELOG.md with v1.0.0 feature list
+- [ ] T209 [P] Create CHANGELOG.md with v0.1.0 feature list
 - [ ] T210 Run full test suite on PHP 8.1, 8.2, 8.3, 8.4, 8.5
 - [ ] T211 Generate coverage report - verify >= 80% overall
 - [ ] T212 Run PHPStan level 10 on entire codebase - zero errors required
@@ -412,7 +412,7 @@
 - [ ] T217 Documentation review: Verify all PHPDoc complete
 - [ ] T218 Example validation: Run all example files, verify output
 - [ ] T219 Final integration test: Complex multi-series chart with all features
-- [ ] T220 Tag release v1.0.0
+- [ ] T220 Tag release 0.1.0 in git with changelog (MANUAL TASK)
 
 **Checkpoint**: Feature complete, all quality gates passed, ready for release
 

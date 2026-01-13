@@ -70,6 +70,7 @@ final class SvgRenderer
         match ($type) {
             ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
             ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
+            ChartType::Scatter => $svg .= $this->renderScatterChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
             default => $svg .= $this->renderPlaceholder($type),
         };
 
@@ -377,6 +378,167 @@ final class SvgRenderer
                 if ($dataLabelsEnabled) {
                     $labelX = $x + $barWidth / 2;
                     $labelY = $y - 5;
+
+                    $content .= sprintf(
+                        '<text x="%.2f" y="%.2f" font-size="12" fill="#333" text-anchor="middle">%g</text>',
+                        $labelX,
+                        $labelY,
+                        $point->y
+                    );
+                }
+            }
+        }
+
+        return $content;
+    }
+
+
+    /**
+     * @param array<DataSeries> $dataSeries
+     */
+    private function renderScatterChart(
+        array $dataSeries,
+        ColorConfiguration $colorConfig,
+        GridConfiguration $gridConfig,
+        AxisConfiguration $axisConfig,
+        bool $dataLabelsEnabled
+    ): string {
+        $content = '';
+
+        $marginLeft = 50;
+        $marginRight = 50;
+        $marginTop = 50;
+        $marginBottom = 50;
+
+        $chartWidth = $this->width - $marginLeft - $marginRight;
+        $chartHeight = $this->height - $marginTop - $marginBottom;
+
+        // Draw axes
+        $axisColor = ColorParser::parse($colorConfig->getAxisColor());
+        $content .= sprintf(
+            '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
+            $marginLeft,
+            $marginTop,
+            $marginLeft,
+            $this->height - $marginBottom,
+            $axisColor['r'],
+            $axisColor['g'],
+            $axisColor['b']
+        );
+        $content .= sprintf(
+            '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
+            $marginLeft,
+            $this->height - $marginBottom,
+            $this->width - $marginRight,
+            $this->height - $marginBottom,
+            $axisColor['r'],
+            $axisColor['g'],
+            $axisColor['b']
+        );
+
+        // Collect all data points for bounds calculation
+        $allPoints = [];
+        foreach ($dataSeries as $series) {
+            $allPoints = array_merge($allPoints, $series->getPoints());
+        }
+
+        if (count($allPoints) === 0) {
+            return $content;
+        }
+
+        // Validate data against axis ranges if clip mode is Throw
+        $this->validateDataPoints($dataSeries, $axisConfig);
+
+        // Calculate bounds with axis ranges or auto-scale
+        if ($axisConfig->hasXRange()) {
+            $minX = $axisConfig->getXMin() ?? 0.0;
+            $maxX = $axisConfig->getXMax() ?? 1.0;
+        } else {
+            $minX = $allPoints[0]->x;
+            $maxX = $allPoints[0]->x;
+            foreach ($allPoints as $point) {
+                $minX = min($minX, $point->x);
+                $maxX = max($maxX, $point->x);
+            }
+        }
+
+        if ($axisConfig->hasYRange()) {
+            $minY = $axisConfig->getYMin() ?? 0.0;
+            $maxY = $axisConfig->getYMax() ?? 1.0;
+        } else {
+            $minY = $allPoints[0]->y;
+            $maxY = $allPoints[0]->y;
+            foreach ($allPoints as $point) {
+                $minY = min($minY, $point->y);
+                $maxY = max($maxY, $point->y);
+            }
+        }
+
+        $rangeX = $maxX - $minX;
+        $rangeY = $maxY - $minY;
+        if ($rangeX === 0.0) {
+            $rangeX = 1.0;
+        }
+        if ($rangeY === 0.0) {
+            $rangeY = 1.0;
+        }
+
+        // Render grid if enabled
+        if ($gridConfig->isEnabled()) {
+            $content .= $this->renderGrid(
+                $gridConfig,
+                $marginLeft,
+                $marginTop,
+                $chartWidth,
+                $chartHeight,
+                $minX,
+                $maxX,
+                $minY,
+                $maxY,
+                $rangeX,
+                $rangeY
+            );
+        }
+
+        // Render each data series as scatter points
+        foreach ($dataSeries as $series) {
+            $points = $series->getPoints();
+            if (count($points) === 0) {
+                continue;
+            }
+
+            // Get series color
+            $color = $series->getLineColor() ?? '#3498db';
+            $pointColor = ColorParser::parse($color);
+
+            // Render each point as a circle
+            foreach ($points as $point) {
+                // Skip points outside axis ranges if clipping is enabled
+                if ($axisConfig->getClipMode() === AxisClipMode::Clip) {
+                    if ($axisConfig->hasXRange() && ($point->x < $minX || $point->x > $maxX)) {
+                        continue;
+                    }
+                    if ($axisConfig->hasYRange() && ($point->y < $minY || $point->y > $maxY)) {
+                        continue;
+                    }
+                }
+
+                $x = $marginLeft + (($point->x - $minX) / $rangeX) * $chartWidth;
+                $y = $this->height - $marginBottom - (($point->y - $minY) / $rangeY) * $chartHeight;
+
+                $content .= sprintf(
+                    '<circle cx="%.2f" cy="%.2f" r="4" fill="rgb(%d,%d,%d)" />',
+                    $x,
+                    $y,
+                    $pointColor['r'],
+                    $pointColor['g'],
+                    $pointColor['b']
+                );
+
+                // Render data label if enabled
+                if ($dataLabelsEnabled) {
+                    $labelX = $x;
+                    $labelY = $y - 8;
 
                     $content .= sprintf(
                         '<text x="%.2f" y="%.2f" font-size="12" fill="#333" text-anchor="middle">%g</text>',
