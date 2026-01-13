@@ -222,32 +222,32 @@
 
 ### Tests for User Story 4
 
-- [ ] T112 [P] [US4] Write test for AxisConfiguration in tests/Unit/Configuration/AxisConfigurationTest.php
-- [ ] T113 [P] [US4] Write test for AxisClipMode enum in tests/Unit/Configuration/AxisClipModeTest.php
-- [ ] T114 [P] [US4] Write test for MathUtil.dataToPixel coordinate transform in tests/Unit/Util/MathUtilTest.php
-- [ ] T115 [P] [US4] Write test for MathUtil.calculateNiceNumber in tests/Unit/Util/MathUtilTest.php
-- [ ] T116 [US4] Write integration test for manual Y-axis range in tests/Integration/AxisScalingTest.php
-- [ ] T117 [US4] Write integration test for auto-scaling in tests/Integration/AxisScalingTest.php
-- [ ] T118 [US4] Write integration test for out-of-range exception in tests/Integration/AxisScalingTest.php
-- [ ] T119 [US4] Write integration test for clip mode in tests/Integration/AxisScalingTest.php
-- [ ] T120 [US4] Verify all US4 tests FAIL (RED phase)
+- [X] T112 [P] [US4] Write test for AxisConfiguration in tests/Unit/Configuration/AxisConfigurationTest.php
+- [X] T113 [P] [US4] Write test for AxisClipMode enum in tests/Unit/Configuration/AxisClipModeTest.php
+- [X] T114 [P] [US4] Write test for MathUtil.dataToPixel coordinate transform in tests/Unit/Util/MathUtilTest.php
+- [X] T115 [P] [US4] Write test for MathUtil.calculateNiceNumber in tests/Unit/Util/MathUtilTest.php
+- [X] T116 [US4] Write integration test for manual Y-axis range in tests/Integration/AxisScalingTest.php
+- [X] T117 [US4] Write integration test for auto-scaling in tests/Integration/AxisScalingTest.php
+- [X] T118 [US4] Write integration test for out-of-range exception in tests/Integration/AxisScalingTest.php
+- [X] T119 [US4] Write integration test for clip mode in tests/Integration/AxisScalingTest.php
+- [X] T120 [US4] Verify all US4 tests FAIL (RED phase)
 
 ### Implementation for User Story 4
 
-- [ ] T121 [P] [US4] Implement AxisConfiguration.php with range and clip mode in src/Configuration/
-- [ ] T122 [P] [US4] Implement AxisClipMode.php enum in src/Configuration/
-- [ ] T123 [US4] Add coordinate transformation methods to MathUtil.php
-- [ ] T124 [US4] Add auto-scaling logic to MathUtil.php
-- [ ] T125 [US4] Add setAxisRange() method to Chart.php
-- [ ] T126 [US4] Add setAxisClipMode() method to Chart.php
-- [ ] T127 [US4] Implement axis scaling in chart renderers
-- [ ] T128 [US4] Implement out-of-range validation in Chart.generate()
-- [ ] T129 [US4] Run all US4 tests - verify PASS (GREEN phase)
-- [ ] T130 [US4] Refactor axis code (REFACTOR phase)
-- [ ] T131 [US4] Run PHPStan level 10 - fix errors
-- [ ] T132 [US4] Run PHP-CS-Fixer - fix violations
-- [ ] T133 [US4] Verify coverage >= 80%
-- [ ] T134 [US4] Create axis-scaling-example.php in examples/
+- [X] T121 [P] [US4] Implement AxisConfiguration.php with range and clip mode in src/Configuration/
+- [X] T122 [P] [US4] Implement AxisClipMode.php enum in src/Configuration/
+- [X] T123 [US4] Add coordinate transformation methods to MathUtil.php
+- [X] T124 [US4] Add auto-scaling logic to MathUtil.php
+- [X] T125 [US4] Add setAxisRange() method to Chart.php
+- [X] T126 [US4] Add setAxisClipMode() method to Chart.php
+- [X] T127 [US4] Implement axis scaling in chart renderers
+- [X] T128 [US4] Implement out-of-range validation in Chart.generate()
+- [X] T129 [US4] Run all US4 tests - verify PASS (GREEN phase)
+- [X] T130 [US4] Refactor axis code (REFACTOR phase)
+- [X] T131 [US4] Run PHPStan level 10 - fix errors
+- [X] T132 [US4] Run PHP-CS-Fixer - fix violations
+- [X] T133 [US4] Verify coverage >= 80%
+- [X] T134 [US4] Create axis-scaling-example.php in examples/
 
 **Checkpoint**: Axis scaling fully functional
 
