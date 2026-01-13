@@ -188,27 +188,27 @@
 
 ### Tests for User Story 3
 
-- [ ] T094 [P] [US3] Write test for GridConfiguration in tests/Unit/Configuration/GridConfigurationTest.php
-- [ ] T095 [P] [US3] Write test for MathUtil.calculateGridSpacing in tests/Unit/Util/MathUtilTest.php
-- [ ] T096 [US3] Write integration test for horizontal grid in tests/Integration/GridRenderingTest.php
-- [ ] T097 [US3] Write integration test for vertical grid in tests/Integration/GridRenderingTest.php
-- [ ] T098 [US3] Write integration test for custom grid spacing in tests/Integration/GridRenderingTest.php
-- [ ] T099 [US3] Verify all US3 tests FAIL (RED phase)
+- [X] T094 [P] [US3] Write test for GridConfiguration in tests/Unit/Configuration/GridConfigurationTest.php
+- [X] T095 [P] [US3] Write test for MathUtil.calculateGridSpacing in tests/Unit/Util/MathUtilTest.php
+- [X] T096 [US3] Write integration test for horizontal grid in tests/Integration/GridRenderingTest.php
+- [X] T097 [US3] Write integration test for vertical grid in tests/Integration/GridRenderingTest.php
+- [X] T098 [US3] Write integration test for custom grid spacing in tests/Integration/GridRenderingTest.php
+- [X] T099 [US3] Verify all US3 tests FAIL (RED phase)
 
 ### Implementation for User Story 3
 
-- [ ] T100 [P] [US3] Implement GridConfiguration.php as readonly value object in src/Configuration/
-- [ ] T101 [P] [US3] Implement MathUtil.php with grid spacing calculation in src/Util/
-- [ ] T102 [US3] Add enableGrid() method to Chart.php
-- [ ] T103 [US3] Add setGridStyle() method to Chart.php
-- [ ] T104 [US3] Add grid rendering to RasterRenderer.php
-- [ ] T105 [US3] Add grid rendering to SvgRenderer.php
+- [X] T100 [P] [US3] Implement GridConfiguration.php as readonly value object in src/Configuration/
+- [X] T101 [P] [US3] Implement MathUtil.php with grid spacing calculation in src/Util/
+- [X] T102 [US3] Add enableGrid() method to Chart.php
+- [X] T103 [US3] Add setGridStyle() method to Chart.php
+- [ ] T104 [US3] Add grid rendering to RasterRenderer.php (deferred - PNG/WEBP)
+- [ ] T105 [US3] Add grid rendering to SvgRenderer.php (INCOMPLETE - see PHASE6_INCOMPLETE.md)
 - [ ] T106 [US3] Run all US3 tests - verify PASS (GREEN phase)
 - [ ] T107 [US3] Refactor grid code (REFACTOR phase)
-- [ ] T108 [US3] Run PHPStan level 10 - fix errors
+- [ ] T108 [US3] Run PHPStan level 10 - fix errors (1 error remaining)
 - [ ] T109 [US3] Run PHP-CS-Fixer - fix violations
 - [ ] T110 [US3] Verify coverage >= 80%
-- [ ] T111 [US3] Create grid-lines-example.php in examples/
+- [X] T111 [US3] Create grid-lines-example.php in examples/
 
 **Checkpoint**: Grid lines fully functional
 

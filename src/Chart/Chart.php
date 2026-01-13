@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Codryn\PHPFastChart\Chart;
 
 use Codryn\PHPFastChart\Configuration\ColorConfiguration;
+use Codryn\PHPFastChart\Configuration\GridConfiguration;
 use Codryn\PHPFastChart\Configuration\ImageFormat;
 use Codryn\PHPFastChart\Data\DataSeries;
 use Codryn\PHPFastChart\Exception\InvalidArgumentException;
@@ -20,7 +21,8 @@ final class Chart
     private int $height = 600;
     private ImageFormat $format = ImageFormat::SVG;
     private ColorConfiguration $colorConfig;
-
+    private GridConfiguration $gridConfig;
+    
     /** @var array<DataSeries> */
     private array $dataSeries = [];
 
@@ -28,6 +30,7 @@ final class Chart
         private readonly ChartType $type,
     ) {
         $this->colorConfig = new ColorConfiguration();
+        $this->gridConfig = new GridConfiguration();
     }
 
     /**
@@ -46,10 +49,10 @@ final class Chart
         if (!Validator::validateDimension($height)) {
             throw new InvalidArgumentException("Height must be between 50 and 4000, got {$height}");
         }
-
+        
         $this->width = $width;
         $this->height = $height;
-
+        
         return $this;
     }
 
@@ -81,6 +84,42 @@ final class Chart
     }
 
     /**
+     * Enable grid lines.
+     */
+    public function enableGrid(bool $enabled = true): self
+    {
+        $this->gridConfig = $this->gridConfig->withEnabled($enabled);
+        return $this;
+    }
+
+    /**
+     * Set grid line color.
+     */
+    public function setGridColor(string $color): self
+    {
+        $this->gridConfig = $this->gridConfig->withColor($color)->withEnabled(true);
+        return $this;
+    }
+
+    /**
+     * Set grid line spacing.
+     */
+    public function setGridSpacing(float $spacing): self
+    {
+        $this->gridConfig = $this->gridConfig->withSpacing($spacing);
+        return $this;
+    }
+
+    /**
+     * Set grid line width.
+     */
+    public function setGridLineWidth(float $width): self
+    {
+        $this->gridConfig = $this->gridConfig->withLineWidth($width);
+        return $this;
+    }
+
+    /**
      * Add a data series to the chart.
      */
     public function addDataSeries(DataSeries $series): self
@@ -98,12 +137,12 @@ final class Chart
     public function generate(string $outputPath): void
     {
         $content = $this->render();
-
+        
         $directory = dirname($outputPath);
         if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
             throw new InvalidArgumentException("Failed to create directory: {$directory}");
         }
-
+        
         file_put_contents($outputPath, $content);
     }
 
@@ -118,14 +157,15 @@ final class Chart
         if (count($this->dataSeries) === 0) {
             throw new InvalidArgumentException('Chart must have at least one data series');
         }
-
+        
         // For MVP, only SVG is implemented
         $renderer = new SvgRenderer($this->width, $this->height);
-
+        
         return $renderer->render(
             $this->type,
             $this->dataSeries,
-            $this->colorConfig
+            $this->colorConfig,
+            $this->gridConfig
         );
     }
 }
