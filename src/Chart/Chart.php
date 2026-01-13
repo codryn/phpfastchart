@@ -20,7 +20,7 @@ final class Chart
     private int $height = 600;
     private ImageFormat $format = ImageFormat::SVG;
     private ColorConfiguration $colorConfig;
-    
+
     /** @var array<DataSeries> */
     private array $dataSeries = [];
 
@@ -46,10 +46,10 @@ final class Chart
         if (!Validator::validateDimension($height)) {
             throw new InvalidArgumentException("Height must be between 50 and 4000, got {$height}");
         }
-        
+
         $this->width = $width;
         $this->height = $height;
-        
+
         return $this;
     }
 
@@ -98,12 +98,12 @@ final class Chart
     public function generate(string $outputPath): void
     {
         $content = $this->render();
-        
+
         $directory = dirname($outputPath);
         if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
             throw new InvalidArgumentException("Failed to create directory: {$directory}");
         }
-        
+
         file_put_contents($outputPath, $content);
     }
 
@@ -118,10 +118,10 @@ final class Chart
         if (count($this->dataSeries) === 0) {
             throw new InvalidArgumentException('Chart must have at least one data series');
         }
-        
+
         // For MVP, only SVG is implemented
         $renderer = new SvgRenderer($this->width, $this->height);
-        
+
         return $renderer->render(
             $this->type,
             $this->dataSeries,

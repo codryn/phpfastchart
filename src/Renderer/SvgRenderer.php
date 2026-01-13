@@ -37,7 +37,7 @@ final class SvgRenderer
             $this->width,
             $this->height
         );
-        
+
         // Background
         $bgColor = ColorParser::parse($colorConfig->getBackgroundColor());
         $svg .= sprintf(
@@ -48,14 +48,14 @@ final class SvgRenderer
         );
 
         // Render based on chart type
-        match ($type) {
-            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig),
-            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig),
-            default => $svg .= $this->renderPlaceholder($type),
+        $svg .= match ($type) {
+            ChartType::Line => $this->renderLineChart($dataSeries, $colorConfig),
+            ChartType::Bar => $this->renderBarChart($dataSeries, $colorConfig),
+            default => $this->renderPlaceholder($type),
         };
 
         $svg .= '</svg>';
-        
+
         return $svg;
     }
 
@@ -66,7 +66,6 @@ final class SvgRenderer
     {
         $content = '';
 
-        // Simple rendering with margins
         $marginLeft = 50;
         $marginRight = 50;
         $marginTop = 50;
@@ -75,7 +74,7 @@ final class SvgRenderer
         $chartWidth = $this->width - $marginLeft - $marginRight;
         $chartHeight = $this->height - $marginTop - $marginBottom;
 
-        // Draw axes
+        // Draw Y axis
         $axisColor = ColorParser::parse($colorConfig->getAxisColor());
         $content .= sprintf(
             '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
@@ -87,6 +86,7 @@ final class SvgRenderer
             $axisColor['g'],
             $axisColor['b']
         );
+        // Draw X axis
         $content .= sprintf(
             '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
             $marginLeft,
@@ -97,23 +97,26 @@ final class SvgRenderer
             $axisColor['g'],
             $axisColor['b']
         );
+
+        foreach ($dataSeries as $series) {
+            $points = $series->getPoints();
             if (count($points) === 0) {
                 continue;
             }
-            
+
             // Find data bounds
             $minX = $points[0]->x;
             $maxX = $points[0]->x;
             $minY = $points[0]->y;
             $maxY = $points[0]->y;
-            
+
             foreach ($points as $point) {
                 $minX = min($minX, $point->x);
                 $maxX = max($maxX, $point->x);
                 $minY = min($minY, $point->y);
                 $maxY = max($maxY, $point->y);
             }
-            
+
             // Add padding
             $rangeX = $maxX - $minX;
             $rangeY = $maxY - $minY;
@@ -123,20 +126,20 @@ final class SvgRenderer
             if ($rangeY === 0.0) {
                 $rangeY = 1.0;
             }
-            
+
             // Build path
             $pathData = '';
             foreach ($points as $i => $point) {
                 $x = $marginLeft + (($point->x - $minX) / $rangeX) * $chartWidth;
                 $y = $marginTop + $chartHeight - (($point->y - $minY) / $rangeY) * $chartHeight;
-                
+
                 $pathData .= ($i === 0 ? 'M' : 'L') . " {$x},{$y} ";
             }
-            
+
             // Use series color or default
             $color = $series->getLineColor() ?? '#3498db';
             $lineColor = ColorParser::parse($color);
-            
+
             $content .= sprintf(
                 '<path d="%s" fill="none" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
                 trim($pathData),
@@ -145,7 +148,7 @@ final class SvgRenderer
                 $lineColor['b']
             );
         }
-        
+
         return $content;
     }
 
@@ -164,7 +167,7 @@ final class SvgRenderer
         $chartWidth = $this->width - $marginLeft - $marginRight;
         $chartHeight = $this->height - $marginTop - $marginBottom;
 
-        // Draw axes
+        // Draw Y axis
         $axisColor = ColorParser::parse($colorConfig->getAxisColor());
         $content .= sprintf(
             '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
@@ -176,6 +179,7 @@ final class SvgRenderer
             $axisColor['g'],
             $axisColor['b']
         );
+        // Draw X axis
         $content .= sprintf(
             '<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
             $marginLeft,
@@ -187,40 +191,52 @@ final class SvgRenderer
             $axisColor['b']
         );
 
+        if (count($dataSeries) === 0) {
+            return $content;
+        }
+
+        // Calculate total number of data points across all series
+        $totalPoints = 0;
         foreach ($dataSeries as $series) {
-            $points = $series->getPoints();
-            if (count($points) === 0) {
-                continue;
-            }
+            $totalPoints = max($totalPoints, count($series->getPoints()));
+        }
 
-            // Find min/max for scaling
-            $minY = $points[0]->y;
-            $maxY = $points[0]->y;
+        if ($totalPoints === 0) {
+            return $content;
+        }
 
-            foreach ($points as $point) {
+        // Find global data bounds
+        $minY = PHP_FLOAT_MAX;
+        $maxY = PHP_FLOAT_MIN;
+        foreach ($dataSeries as $series) {
+            foreach ($series->getPoints() as $point) {
                 $minY = min($minY, $point->y);
                 $maxY = max($maxY, $point->y);
             }
+        }
 
-            $rangeY = $maxY - $minY;
-            if ($rangeY === 0.0) {
-                $rangeY = 1.0;
-            }
+        $rangeY = $maxY - $minY;
+        if ($rangeY === 0.0) {
+            $rangeY = 1.0;
+        }
 
-            // Calculate bar width
-            $barWidth = $chartWidth / (count($points) * 2);
+        // Calculate bar dimensions
+        $barGroupWidth = $chartWidth / $totalPoints;
+        $barWidth = $barGroupWidth / count($dataSeries) * 0.8;
+        $barSpacing = $barGroupWidth * 0.1;
 
-            // Render bars
-            $color = $series->getLineColor() ?? '#3498db';
+        // Render bars
+        foreach ($dataSeries as $seriesIndex => $series) {
+            $color = $series->getLineColor() ?? sprintf('#%06X', mt_rand(0, 0xFFFFFF));
             $barColor = ColorParser::parse($color);
 
-            foreach ($points as $i => $point) {
+            foreach ($series->getPoints() as $pointIndex => $point) {
                 $barHeight = (($point->y - $minY) / $rangeY) * $chartHeight;
-                $x = $marginLeft + ($i * 2 + 0.5) * $barWidth;
-                $y = $this->height - $marginBottom - $barHeight;
+                $x = $marginLeft + $pointIndex * $barGroupWidth + $seriesIndex * $barWidth + $barSpacing;
+                $y = $marginTop + $chartHeight - $barHeight;
 
                 $content .= sprintf(
-                    '<rect x="%f" y="%f" width="%f" height="%f" fill="rgb(%d,%d,%d)" />',
+                    '<rect x="%.2f" y="%.2f" width="%.2f" height="%.2f" fill="rgb(%d,%d,%d)" />',
                     $x,
                     $y,
                     $barWidth,
