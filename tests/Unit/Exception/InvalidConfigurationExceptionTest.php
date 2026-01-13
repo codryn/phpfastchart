@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test InvalidConfigurationException.
+ *
+ * @covers \Codryn\PHPFastChart\Exception\InvalidConfigurationException
  */
 final class InvalidConfigurationExceptionTest extends TestCase
 {

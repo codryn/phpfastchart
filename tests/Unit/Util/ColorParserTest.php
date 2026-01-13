@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test ColorParser utility.
+ *
+ * @covers \Codryn\PHPFastChart\Util\ColorParser
  */
 final class ColorParserTest extends TestCase
 {

@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test DataSeries class.
+ *
+ * @covers \Codryn\PHPFastChart\Data\DataSeries
  */
 final class DataSeriesTest extends TestCase
 {

@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test ChartType enum.
+ *
+ * @covers \Codryn\PHPFastChart\Chart\ChartType
  */
 final class ChartTypeTest extends TestCase
 {

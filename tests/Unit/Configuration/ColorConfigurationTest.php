@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test ColorConfiguration class.
+ *
+ * @covers \Codryn\PHPFastChart\Configuration\ColorConfiguration
  */
 final class ColorConfigurationTest extends TestCase
 {

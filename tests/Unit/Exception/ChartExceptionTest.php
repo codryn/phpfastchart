@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test ChartException base class.
+ *
+ * @covers \Codryn\PHPFastChart\Exception\ChartException
  */
 final class ChartExceptionTest extends TestCase
 {

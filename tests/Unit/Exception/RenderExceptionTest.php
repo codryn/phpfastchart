@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test RenderException.
+ *
+ * @covers \Codryn\PHPFastChart\Exception\RenderException
  */
 final class RenderExceptionTest extends TestCase
 {

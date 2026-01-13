@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test InvalidArgumentException.
+ *
+ * @covers \Codryn\PHPFastChart\Exception\InvalidArgumentException
  */
 final class InvalidArgumentExceptionTest extends TestCase
 {

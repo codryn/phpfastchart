@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test ImageFormat enum.
+ *
+ * @covers \Codryn\PHPFastChart\Configuration\ImageFormat
  */
 final class ImageFormatTest extends TestCase
 {

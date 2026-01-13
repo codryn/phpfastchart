@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test DataPoint class.
+ *
+ * @covers \Codryn\PHPFastChart\Data\DataPoint
  */
 final class DataPointTest extends TestCase
 {

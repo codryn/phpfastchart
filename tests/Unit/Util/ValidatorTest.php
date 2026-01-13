@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test Validator utility.
+ *
+ * @covers \Codryn\PHPFastChart\Util\Validator
  */
 final class ValidatorTest extends TestCase
 {

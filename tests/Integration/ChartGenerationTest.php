@@ -13,6 +13,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Integration test for chart generation.
+ *
+ * @covers \Codryn\PHPFastChart\Chart\Chart
+ * @covers \Codryn\PHPFastChart\Renderer\SvgRenderer
+ * @covers \Codryn\PHPFastChart\Configuration\ColorConfiguration
  */
 final class ChartGenerationTest extends TestCase
 {
@@ -43,24 +47,24 @@ final class ChartGenerationTest extends TestCase
     public function testGenerateSvgLineChart(): void
     {
         $chart = new Chart(ChartType::Line);
-
+        
         $series = new DataSeries('Sales', [
             new DataPoint(1.0, 100.0),
             new DataPoint(2.0, 150.0),
             new DataPoint(3.0, 120.0),
             new DataPoint(4.0, 180.0),
         ]);
-
+        
         $chart->setSize(800, 600)
               ->setFormat(ImageFormat::SVG)
               ->setBackgroundColor('#FFFFFF')
               ->addDataSeries($series);
-
+        
         $outputPath = $this->outputDir . '/test_line.svg';
         $chart->generate($outputPath);
-
+        
         $this->assertFileExists($outputPath);
-
+        
         $content = file_get_contents($outputPath);
         $this->assertNotFalse($content);
         $this->assertStringContainsString('<svg', $content);
@@ -71,16 +75,16 @@ final class ChartGenerationTest extends TestCase
     public function testRenderSvgLineChart(): void
     {
         $chart = new Chart(ChartType::Line);
-
+        
         $series = new DataSeries('Revenue', [
             new DataPoint(1.0, 50.0),
             new DataPoint(2.0, 75.0),
         ], '#FF0000');
-
+        
         $chart->addDataSeries($series);
-
+        
         $content = $chart->render();
-
+        
         $this->assertStringContainsString('<svg', $content);
         $this->assertStringContainsString('</svg>', $content);
         $this->assertStringContainsString('width="800"', $content);
