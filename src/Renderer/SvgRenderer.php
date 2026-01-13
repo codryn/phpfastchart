@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Codryn\PHPFastChart\Renderer;
 
 use Codryn\PHPFastChart\Chart\ChartType;
+use Codryn\PHPFastChart\Configuration\AxisClipMode;
+use Codryn\PHPFastChart\Configuration\AxisConfiguration;
 use Codryn\PHPFastChart\Configuration\ColorConfiguration;
 use Codryn\PHPFastChart\Configuration\GridConfiguration;
 use Codryn\PHPFastChart\Data\DataSeries;
@@ -29,13 +31,15 @@ final class SvgRenderer
      * @param array<DataSeries> $dataSeries Data series to render
      * @param ColorConfiguration $colorConfig Color configuration
      * @param GridConfiguration $gridConfig Grid configuration
+     * @param AxisConfiguration $axisConfig Axis configuration
      * @return string SVG XML content
      */
     public function render(
         ChartType $type,
         array $dataSeries,
         ColorConfiguration $colorConfig,
-        GridConfiguration $gridConfig
+        GridConfiguration $gridConfig,
+        AxisConfiguration $axisConfig
     ): string {
         $svg = sprintf(
             '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">',
@@ -56,8 +60,8 @@ final class SvgRenderer
 
         // Render based on chart type
         match ($type) {
-            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig),
-            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig),
+            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig),
+            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig),
             default => $svg .= $this->renderPlaceholder($type),
         };
 
@@ -72,7 +76,8 @@ final class SvgRenderer
     private function renderLineChart(
         array $dataSeries,
         ColorConfiguration $colorConfig,
-        GridConfiguration $gridConfig
+        GridConfiguration $gridConfig,
+        AxisConfiguration $axisConfig
     ): string {
         $content = '';
 
@@ -118,17 +123,32 @@ final class SvgRenderer
             return $content;
         }
 
-        // Find global data bounds
-        $minX = $allPoints[0]->x;
-        $maxX = $allPoints[0]->x;
-        $minY = $allPoints[0]->y;
-        $maxY = $allPoints[0]->y;
+        // Validate data against axis ranges if clip mode is Throw
+        $this->validateDataPoints($dataSeries, $axisConfig);
 
-        foreach ($allPoints as $point) {
-            $minX = min($minX, $point->x);
-            $maxX = max($maxX, $point->x);
-            $minY = min($minY, $point->y);
-            $maxY = max($maxY, $point->y);
+        // Calculate bounds with axis ranges or auto-scale
+        if ($axisConfig->hasXRange()) {
+            $minX = $axisConfig->getXMin() ?? 0.0;
+            $maxX = $axisConfig->getXMax() ?? 1.0;
+        } else {
+            $minX = $allPoints[0]->x;
+            $maxX = $allPoints[0]->x;
+            foreach ($allPoints as $point) {
+                $minX = min($minX, $point->x);
+                $maxX = max($maxX, $point->x);
+            }
+        }
+
+        if ($axisConfig->hasYRange()) {
+            $minY = $axisConfig->getYMin() ?? 0.0;
+            $maxY = $axisConfig->getYMax() ?? 1.0;
+        } else {
+            $minY = $allPoints[0]->y;
+            $maxY = $allPoints[0]->y;
+            foreach ($allPoints as $point) {
+                $minY = min($minY, $point->y);
+                $maxY = max($maxY, $point->y);
+            }
         }
 
         $rangeX = $maxX - $minX;
@@ -195,7 +215,8 @@ final class SvgRenderer
     private function renderBarChart(
         array $dataSeries,
         ColorConfiguration $colorConfig,
-        GridConfiguration $gridConfig
+        GridConfiguration $gridConfig,
+        AxisConfiguration $axisConfig
     ): string {
         $content = '';
 
@@ -240,17 +261,32 @@ final class SvgRenderer
             return $content;
         }
 
-        // Find min/max for scaling
-        $minY = $allPoints[0]->y;
-        $maxY = $allPoints[0]->y;
-        $minX = $allPoints[0]->x;
-        $maxX = $allPoints[0]->x;
+        // Validate data against axis ranges if clip mode is Throw
+        $this->validateDataPoints($dataSeries, $axisConfig);
 
-        foreach ($allPoints as $point) {
-            $minY = min($minY, $point->y);
-            $maxY = max($maxY, $point->y);
-            $minX = min($minX, $point->x);
-            $maxX = max($maxX, $point->x);
+        // Calculate bounds with axis ranges or auto-scale
+        if ($axisConfig->hasXRange()) {
+            $minX = $axisConfig->getXMin() ?? 0.0;
+            $maxX = $axisConfig->getXMax() ?? 1.0;
+        } else {
+            $minX = $allPoints[0]->x;
+            $maxX = $allPoints[0]->x;
+            foreach ($allPoints as $point) {
+                $minX = min($minX, $point->x);
+                $maxX = max($maxX, $point->x);
+            }
+        }
+
+        if ($axisConfig->hasYRange()) {
+            $minY = $axisConfig->getYMin() ?? 0.0;
+            $maxY = $axisConfig->getYMax() ?? 1.0;
+        } else {
+            $minY = $allPoints[0]->y;
+            $maxY = $allPoints[0]->y;
+            foreach ($allPoints as $point) {
+                $minY = min($minY, $point->y);
+                $maxY = max($maxY, $point->y);
+            }
         }
 
         $rangeY = $maxY - $minY;
@@ -398,5 +434,57 @@ final class SvgRenderer
             '<text x="50%%" y="50%%" text-anchor="middle" fill="#333">%s chart (not yet implemented)</text>',
             $type->value
         );
+    }
+
+    /**
+     * Validate data points against axis ranges.
+     *
+     * @param array<DataSeries> $dataSeries
+     * @throws \InvalidArgumentException If data is out of range and clip mode is Throw
+     */
+    private function validateDataPoints(array $dataSeries, AxisConfiguration $axisConfig): void
+    {
+        if ($axisConfig->getClipMode() === AxisClipMode::Clip) {
+            return; // Skip validation if clipping is enabled
+        }
+
+        foreach ($dataSeries as $series) {
+            $points = $series->getPoints();
+            foreach ($points as $index => $point) {
+                // Check X-axis range
+                if ($axisConfig->hasXRange()) {
+                    $xMin = $axisConfig->getXMin();
+                    $xMax = $axisConfig->getXMax();
+                    if ($point->x < $xMin || $point->x > $xMax) {
+                        throw new \InvalidArgumentException(
+                            sprintf(
+                                'Data point at index %d has X value %g outside axis range [%g, %g]',
+                                $index,
+                                $point->x,
+                                $xMin,
+                                $xMax
+                            )
+                        );
+                    }
+                }
+
+                // Check Y-axis range
+                if ($axisConfig->hasYRange()) {
+                    $yMin = $axisConfig->getYMin();
+                    $yMax = $axisConfig->getYMax();
+                    if ($point->y < $yMin || $point->y > $yMax) {
+                        throw new \InvalidArgumentException(
+                            sprintf(
+                                'Data point at index %d has Y value %g outside axis range [%g, %g]',
+                                $index,
+                                $point->y,
+                                $yMin,
+                                $yMax
+                            )
+                        );
+                    }
+                }
+            }
+        }
     }
 }

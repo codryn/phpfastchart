@@ -62,4 +62,69 @@ final class MathUtilTest extends TestCase
 
         $this->assertSame($spacing1, $spacing2);
     }
+
+    public function testDataToPixelConvertsCorrectly(): void
+    {
+        // Map data range [0, 100] to pixel range [50, 450] (400 pixels)
+        $pixel = MathUtil::dataToPixel(50.0, 0.0, 100.0, 50.0, 450.0);
+
+        $this->assertSame(250.0, $pixel);
+    }
+
+    public function testDataToPixelWithNegativeDataRange(): void
+    {
+        // Map data range [-50, 50] to pixel range [0, 400]
+        $pixel = MathUtil::dataToPixel(0.0, -50.0, 50.0, 0.0, 400.0);
+
+        $this->assertSame(200.0, $pixel);
+    }
+
+    public function testDataToPixelAtBoundaries(): void
+    {
+        // Test at minimum boundary
+        $pixelMin = MathUtil::dataToPixel(0.0, 0.0, 100.0, 50.0, 450.0);
+        $this->assertSame(50.0, $pixelMin);
+
+        // Test at maximum boundary
+        $pixelMax = MathUtil::dataToPixel(100.0, 0.0, 100.0, 50.0, 450.0);
+        $this->assertSame(450.0, $pixelMax);
+    }
+
+    public function testPixelToDataConvertsCorrectly(): void
+    {
+        // Map pixel range [50, 450] back to data range [0, 100]
+        $data = MathUtil::pixelToData(250.0, 0.0, 100.0, 50.0, 450.0);
+
+        $this->assertSame(50.0, $data);
+    }
+
+    public function testCalculateNiceNumberReturns1Or2Or5Multiplied(): void
+    {
+        // Test various ranges to ensure nice numbers
+        $nice1 = MathUtil::calculateNiceNumber(8.7);
+        $this->assertSame(10.0, $nice1);
+
+        $nice2 = MathUtil::calculateNiceNumber(3.2);
+        $this->assertSame(5.0, $nice2);
+
+        $nice3 = MathUtil::calculateNiceNumber(1.8);
+        $this->assertSame(2.0, $nice3);
+
+        $nice4 = MathUtil::calculateNiceNumber(0.7);
+        $this->assertSame(1.0, $nice4);
+    }
+
+    public function testCalculateNiceNumberWithSmallValues(): void
+    {
+        $nice = MathUtil::calculateNiceNumber(0.03);
+        $this->assertGreaterThan(0, $nice);
+        $this->assertLessThanOrEqual(0.1, $nice);
+    }
+
+    public function testCalculateNiceNumberWithLargeValues(): void
+    {
+        $nice = MathUtil::calculateNiceNumber(8700.0);
+        $this->assertGreaterThanOrEqual(5000.0, $nice);
+        $this->assertLessThanOrEqual(10000.0, $nice);
+    }
 }

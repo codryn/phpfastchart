@@ -48,4 +48,87 @@ final class MathUtil
 
         return $niceNormalized * $magnitude;
     }
+
+    /**
+     * Convert a data value to pixel coordinate.
+     *
+     * @param float $dataValue The value in data space
+     * @param float $dataMin Minimum data value
+     * @param float $dataMax Maximum data value
+     * @param float $pixelMin Minimum pixel coordinate
+     * @param float $pixelMax Maximum pixel coordinate
+     * @return float Pixel coordinate
+     */
+    public static function dataToPixel(
+        float $dataValue,
+        float $dataMin,
+        float $dataMax,
+        float $pixelMin,
+        float $pixelMax
+    ): float {
+        $dataRange = $dataMax - $dataMin;
+
+        if ($dataRange === 0.0) {
+            return ($pixelMin + $pixelMax) / 2;
+        }
+
+        $normalizedValue = ($dataValue - $dataMin) / $dataRange;
+        return $pixelMin + $normalizedValue * ($pixelMax - $pixelMin);
+    }
+
+    /**
+     * Convert a pixel coordinate to data value.
+     *
+     * @param float $pixelValue The pixel coordinate
+     * @param float $dataMin Minimum data value
+     * @param float $dataMax Maximum data value
+     * @param float $pixelMin Minimum pixel coordinate
+     * @param float $pixelMax Maximum pixel coordinate
+     * @return float Data value
+     */
+    public static function pixelToData(
+        float $pixelValue,
+        float $dataMin,
+        float $dataMax,
+        float $pixelMin,
+        float $pixelMax
+    ): float {
+        $pixelRange = $pixelMax - $pixelMin;
+
+        if ($pixelRange === 0.0) {
+            return ($dataMin + $dataMax) / 2;
+        }
+
+        $normalizedValue = ($pixelValue - $pixelMin) / $pixelRange;
+        return $dataMin + $normalizedValue * ($dataMax - $dataMin);
+    }
+
+    /**
+     * Calculate a "nice" number for axis scaling.
+     *
+     * Returns a rounded number suitable for axis labels (1, 2, 5 × 10^n).
+     *
+     * @param float $value The rough value to round
+     * @return float A nice rounded number
+     */
+    public static function calculateNiceNumber(float $value): float
+    {
+        if ($value === 0.0) {
+            return 0.0;
+        }
+
+        $absValue = abs($value);
+        $magnitude = pow(10, floor(log10($absValue)));
+        $normalized = $absValue / $magnitude;
+
+        // Round to nice number: 1, 2, 5, or 10
+        $niceNormalized = match (true) {
+            $normalized <= 1.0 => 1.0,
+            $normalized <= 2.0 => 2.0,
+            $normalized <= 5.0 => 5.0,
+            default => 10.0,
+        };
+
+        return $niceNormalized * $magnitude * ($value < 0 ? -1 : 1);
+    }
 }

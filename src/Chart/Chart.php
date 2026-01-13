@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Codryn\PHPFastChart\Chart;
 
+use Codryn\PHPFastChart\Configuration\AxisClipMode;
+use Codryn\PHPFastChart\Configuration\AxisConfiguration;
 use Codryn\PHPFastChart\Configuration\ColorConfiguration;
 use Codryn\PHPFastChart\Configuration\GridConfiguration;
 use Codryn\PHPFastChart\Configuration\ImageFormat;
@@ -22,6 +24,7 @@ final class Chart
     private ImageFormat $format = ImageFormat::SVG;
     private ColorConfiguration $colorConfig;
     private GridConfiguration $gridConfig;
+    private AxisConfiguration $axisConfig;
 
     /** @var array<DataSeries> */
     private array $dataSeries = [];
@@ -31,6 +34,7 @@ final class Chart
     ) {
         $this->colorConfig = new ColorConfiguration();
         $this->gridConfig = new GridConfiguration();
+        $this->axisConfig = new AxisConfiguration();
     }
 
     /**
@@ -129,6 +133,33 @@ final class Chart
     }
 
     /**
+     * Set X-axis range.
+     */
+    public function setXAxisRange(float $min, float $max): self
+    {
+        $this->axisConfig = $this->axisConfig->withXRange($min, $max);
+        return $this;
+    }
+
+    /**
+     * Set Y-axis range.
+     */
+    public function setYAxisRange(float $min, float $max): self
+    {
+        $this->axisConfig = $this->axisConfig->withYRange($min, $max);
+        return $this;
+    }
+
+    /**
+     * Set axis clip mode (Clip or Throw).
+     */
+    public function setAxisClipMode(AxisClipMode $mode): self
+    {
+        $this->axisConfig = $this->axisConfig->withClipMode($mode);
+        return $this;
+    }
+
+    /**
      * Generate chart and save to file.
      *
      * @param string $outputPath Output file path
@@ -165,7 +196,8 @@ final class Chart
             $this->type,
             $this->dataSeries,
             $this->colorConfig,
-            $this->gridConfig
+            $this->gridConfig,
+            $this->axisConfig
         );
     }
 }
