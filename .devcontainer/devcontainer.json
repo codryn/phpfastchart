@@ -28,6 +28,7 @@
 					"dom",
 					"fileinfo",
 					"filter",
+					"gd",
 					"hash",
 					"iconv",
 					"json",
@@ -66,7 +67,9 @@
 		}
 	},
 
-	"postCreateCommand": "bash -c 'php -v && composer --version && git --version'",
+	"postCreateCommand": "bash -c 'php -v && composer --version && git --version && php -m | grep -i gd'",
+	
+	"onCreateCommand": "apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install -j$(nproc) gd",
 
 	"remoteUser": "vscode",
 
