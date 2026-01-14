@@ -36,7 +36,10 @@ final class RasterRenderingTest extends TestCase
         parent::tearDown();
         // Clean up test files
         if (is_dir($this->outputDir)) {
-            array_map('unlink', glob($this->outputDir . '/*'));
+            $files = glob($this->outputDir . '/*');
+            if ($files !== false) {
+                array_map('unlink', $files);
+            }
             rmdir($this->outputDir);
         }
     }
@@ -176,8 +179,8 @@ final class RasterRenderingTest extends TestCase
         $chart->setFormat(ImageFormat::PNG)
             ->setSize(800, 600)
             ->setTitle('Weather Data')
-            ->setAxisLabel('x', 'Day')
-            ->setAxisLabel('y', 'Temperature (°C)')
+            ->setXAxisLabel('Day')
+            ->setYAxisLabel('Temperature (°C)')
             ->enableGrid()
             ->addDataSeries($series);
 
@@ -269,7 +272,6 @@ final class RasterRenderingTest extends TestCase
 
         $output = $chart->render();
 
-        $this->assertIsString($output);
         $this->assertGreaterThan(100, strlen($output));
         // PNG files start with specific magic bytes
         $this->assertStringStartsWith("\x89PNG", $output);
