@@ -69,7 +69,7 @@
 
 	"postCreateCommand": "bash -c 'php -v && composer --version && git --version && php -m | grep -i gd'",
 
-	"onCreateCommand": "sudo apt-get update && sudo apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev && sudo docker-php-ext-configure gd --with-freetype --with-jpeg && sudo docker-php-ext-install -j$(nproc) gd",
+	"onCreateCommand": "sudo bash -c 'apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install -j$(nproc) gd && echo \"extension=gd.so\" > /usr/local/etc/php/conf.d/docker-php-ext-gd.ini'",
 
 	"remoteUser": "vscode",
 
