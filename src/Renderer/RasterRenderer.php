@@ -96,7 +96,7 @@ final class RasterRenderer implements RendererInterface
 
         // Render legend
         if ($legendConfig->isEnabled()) {
-            $this->renderLegend($dataSeries, $legendConfig);
+            $this->renderLegend($dataSeries, $legendConfig, $type);
         }
 
         // Output image
@@ -696,14 +696,40 @@ final class RasterRenderer implements RendererInterface
     /**
      * @param array<DataSeries> $dataSeries
      */
-    private function renderLegend(array $dataSeries, LegendConfiguration $legendConfig): void
+    private function renderLegend(array $dataSeries, LegendConfiguration $legendConfig, ChartType $type): void
     {
         $itemHeight = 20;
         $itemWidth = 120;
         $padding = 10;
         $symbolSize = 12;
 
-        $legendHeight = count($dataSeries) * $itemHeight + $padding * 2;
+        // For pie charts, show each slice (data point) instead of series
+        $legendItems = [];
+        if ($type === ChartType::Pie && count($dataSeries) > 0) {
+            $series = $dataSeries[0]; // Pie chart uses first series only
+            $points = $series->getPoints();
+
+            // Default color palette for slices
+            $colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+            ];
+
+            foreach ($points as $index => $point) {
+                $color = $point->color ?? $series->getLineColor() ?? $colors[$index % count($colors)];
+                $label = $point->label ?? "Slice $index";
+                $legendItems[] = ['label' => $label, 'color' => $color];
+            }
+        } else {
+            // For other chart types, show series
+            foreach ($dataSeries as $series) {
+                $color = $series->getLineColor() ?? '#3498db';
+                $label = $series->getName();
+                $legendItems[] = ['label' => $label, 'color' => $color];
+            }
+        }
+
+        $legendHeight = count($legendItems) * $itemHeight + $padding * 2;
         $legendWidth = $itemWidth + $padding * 2;
 
         // Determine position
@@ -724,20 +750,20 @@ final class RasterRenderer implements RendererInterface
         $textColor = $this->allocateColor($legendConfig->getTextColor());
         $itemY = (int) $y + $padding;
 
-        foreach ($dataSeries as $series) {
+        foreach ($legendItems as $item) {
             // Draw color symbol
-            $seriesColor = $this->allocateColor($series->getLineColor() ?? '#3498db');
+            $itemColor = $this->allocateColor($item['color']);
             imagefilledrectangle(
                 $this->image,
                 (int) $x + $padding,
                 $itemY + ($itemHeight - $symbolSize) / 2,
                 (int) $x + $padding + $symbolSize,
                 $itemY + ($itemHeight - $symbolSize) / 2 + $symbolSize,
-                $seriesColor
+                $itemColor
             );
 
-            // Draw series name
-            imagestring($this->image, 3, (int) $x + $padding + $symbolSize + 8, $itemY + 4, $series->getName(), $textColor);
+            // Draw item label
+            imagestring($this->image, 3, (int) $x + $padding + $symbolSize + 8, $itemY + 4, $item['label'], $textColor);
 
             $itemY += $itemHeight;
         }

@@ -83,7 +83,7 @@ final class SvgRenderer implements RendererInterface
 
         // Render legend
         if ($legendConfig->isEnabled()) {
-            $svg .= $this->renderLegend($dataSeries, $legendConfig);
+            $svg .= $this->renderLegend($dataSeries, $legendConfig, $type);
         }
 
         $svg .= '</svg>';
@@ -1022,9 +1022,10 @@ final class SvgRenderer implements RendererInterface
      *
      * @param array<DataSeries> $dataSeries Data series to show in legend
      * @param LegendConfiguration $legendConfig Legend configuration
+     * @param ChartType $type Chart type to determine legend rendering strategy
      * @return string SVG content for legend
      */
-    private function renderLegend(array $dataSeries, LegendConfiguration $legendConfig): string
+    private function renderLegend(array $dataSeries, LegendConfiguration $legendConfig, ChartType $type): string
     {
         $content = '';
 
@@ -1041,8 +1042,34 @@ final class SvgRenderer implements RendererInterface
         $bgColor = ColorParser::parse($legendConfig->getBackgroundColor());
         $borderColor = ColorParser::parse($legendConfig->getBorderColor());
 
+        // For pie charts, show each slice (data point) instead of series
+        $legendItems = [];
+        if ($type === ChartType::Pie && count($dataSeries) > 0) {
+            $series = $dataSeries[0]; // Pie chart uses first series only
+            $points = $series->getPoints();
+
+            // Default color palette for slices
+            $colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+            ];
+
+            foreach ($points as $index => $point) {
+                $color = $point->color ?? $series->getLineColor() ?? $colors[$index % count($colors)];
+                $label = $point->label ?? "Slice $index";
+                $legendItems[] = ['label' => $label, 'color' => $color];
+            }
+        } else {
+            // For other chart types, show series
+            foreach ($dataSeries as $series) {
+                $color = $series->getLineColor() ?? '#3498db';
+                $label = $series->getName();
+                $legendItems[] = ['label' => $label, 'color' => $color];
+            }
+        }
+
         // Calculate legend dimensions
-        $legendHeight = count($dataSeries) * $itemHeight + $padding * 2;
+        $legendHeight = count($legendItems) * $itemHeight + $padding * 2;
         $legendWidth = $itemWidth + $padding * 2;
 
         // Determine position
@@ -1070,8 +1097,8 @@ final class SvgRenderer implements RendererInterface
 
         // Draw legend items
         $itemY = $y + $padding;
-        foreach ($dataSeries as $series) {
-            $seriesColor = ColorParser::parse($series->getLineColor() ?? '#3498db');
+        foreach ($legendItems as $item) {
+            $itemColor = ColorParser::parse($item['color']);
 
             // Draw color symbol
             $content .= sprintf(
@@ -1080,12 +1107,12 @@ final class SvgRenderer implements RendererInterface
                 $itemY + ($itemHeight - $symbolSize) / 2,
                 $symbolSize,
                 $symbolSize,
-                $seriesColor['r'],
-                $seriesColor['g'],
-                $seriesColor['b']
+                $itemColor['r'],
+                $itemColor['g'],
+                $itemColor['b']
             );
 
-            // Draw series name
+            // Draw item label
             $content .= sprintf(
                 '<text x="%.2f" y="%.2f" font-size="%d" fill="rgb(%d,%d,%d)" text-anchor="start">%s</text>',
                 $x + $padding + $symbolSize + 8,
@@ -1094,7 +1121,7 @@ final class SvgRenderer implements RendererInterface
                 $textColor['r'],
                 $textColor['g'],
                 $textColor['b'],
-                htmlspecialchars($series->getName(), ENT_XML1, 'UTF-8')
+                htmlspecialchars($item['label'], ENT_XML1, 'UTF-8')
             );
 
             $itemY += $itemHeight;

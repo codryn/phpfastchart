@@ -16,7 +16,7 @@ $chart->setSize(800, 600);
 $chart->setFormat(ImageFormat::SVG);
 $chart->setBackgroundColor('#ffffff');
 $chart->setTitle('Market Share by Product');
-$chart->enableDataLabels(); // Show labels on slices instead of legend
+$chart->enableLegend();
 
 // Add data series (pie chart uses first series only, each point is a slice)
 // Each point can have its own color specified as the 4th parameter
