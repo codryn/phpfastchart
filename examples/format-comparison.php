@@ -17,144 +17,63 @@ if (!is_dir($outputDir)) {
 }
 
 // Check if GD extension is available
-if (!extension_loaded('gd')) {
-    echo "❌ GD extension is not loaded. PNG and WEBP generation requires the GD extension.\n";
-    echo "   Please install php-gd to use raster image formats.\n";
-    exit(1);
+$hasGd = extension_loaded('gd');
+if (!$hasGd) {
+    echo "ℹ️  GD extension is not loaded. Skipping PNG and WEBP generation.\n";
+    echo "   Only SVG format will be generated.\n\n";
 }
 
 echo "📊 Generating charts in multiple formats (PNG, WEBP, SVG)...\n\n";
 
-// Example 1: Line chart in all three formats
-$chart1 = new Chart(ChartType::Line);
+// Example 1: Line chart in multiple formats
+$chart = new Chart(ChartType::Line);
+$chart->setTitle('Format Comparison Example')
+    ->setSize(800, 600);
 
-$revenue = new DataSeries('Revenue', [
-    new DataPoint(1.0, 50000.0, 'Q1'),
-    new DataPoint(2.0, 65000.0, 'Q2'),
-    new DataPoint(3.0, 72000.0, 'Q3'),
-    new DataPoint(4.0, 85000.0, 'Q4'),
+$series = new DataSeries('Revenue', [
+    new DataPoint(1, 50),
+    new DataPoint(2, 65),
+    new DataPoint(3, 72),
+    new DataPoint(4, 85),
 ], '#3498db');
 
-$chart1->setSize(800, 600)
-    ->setTitle('Quarterly Revenue')
-    ->setAxisLabel('x', 'Quarter')
-    ->setAxisLabel('y', 'Revenue ($)')
-    ->enableGrid()
-    ->addDataSeries($revenue);
+$chart->addDataSeries($series);
 
-// Generate PNG
-$chart1->setFormat(ImageFormat::PNG);
-$pngPath = $outputDir . '/format_line.png';
-$chart1->generate($pngPath);
-echo "✅ PNG generated: {$pngPath} (" . filesize($pngPath) . " bytes)\n";
+// Generate SVG (always available)
+$chart->setFormat(ImageFormat::SVG);
+$svgPath = $outputDir . '/format_comparison.svg';
+$chart->generate($svgPath);
+$svgSize = filesize($svgPath);
+echo "✅ SVG generated: {$svgPath} (" . number_format($svgSize) . " bytes)\n";
 
-// Generate WEBP
-$chart1->setFormat(ImageFormat::WEBP);
-$webpPath = $outputDir . '/format_line.webp';
-$chart1->generate($webpPath);
-echo "✅ WEBP generated: {$webpPath} (" . filesize($webpPath) . " bytes)\n";
+if ($hasGd) {
+    // Generate PNG
+    $chart->setFormat(ImageFormat::PNG);
+    $pngPath = $outputDir . '/format_comparison.png';
+    $chart->generate($pngPath);
+    $pngSize = filesize($pngPath);
+    echo "✅ PNG generated: {$pngPath} (" . number_format($pngSize) . " bytes)\n";
 
-// Generate SVG
-$chart1->setFormat(ImageFormat::SVG);
-$svgPath = $outputDir . '/format_line.svg';
-$chart1->generate($svgPath);
-echo "✅ SVG generated: {$svgPath} (" . filesize($svgPath) . " bytes)\n\n";
+    // Generate WEBP
+    $chart->setFormat(ImageFormat::WEBP);
+    $webpPath = $outputDir . '/format_comparison.webp';
+    $chart->generate($webpPath);
+    $webpSize = filesize($webpPath);
+    echo "✅ WEBP generated: {$webpPath} (" . number_format($webpSize) . " bytes)\n\n";
 
-// Example 2: Bar chart with multiple series in PNG
-echo "Generating bar chart in PNG format...\n";
-$chart2 = new Chart(ChartType::Bar);
+    // Show comparison
+    echo "Format Size Comparison:\n";
+    echo "  PNG (800x600):  " . number_format($pngSize) . " bytes\n";
+    echo "  WEBP (800x600): " . number_format($webpSize) . " bytes\n";
+    echo "  SVG (800x600):  " . number_format($svgSize) . " bytes\n\n";
 
-$sales2023 = new DataSeries('2023', [
-    new DataPoint(1.0, 120.0, 'Jan'),
-    new DataPoint(2.0, 140.0, 'Feb'),
-    new DataPoint(3.0, 160.0, 'Mar'),
-], '#9b59b6');
+    // Calculate compression ratios
+    $webpSaving = round(((1 - $webpSize / $pngSize) * 100));
+    echo "💡 WEBP is {$webpSaving}% smaller than PNG\n";
+} else {
+    echo "⏭️  Skipping PNG generation (GD extension not loaded)\n";
+    echo "⏭️  Skipping WEBP generation (GD extension not loaded)\n";
+}
 
-$sales2024 = new DataSeries('2024', [
-    new DataPoint(1.0, 135.0, 'Jan'),
-    new DataPoint(2.0, 165.0, 'Feb'),
-    new DataPoint(3.0, 180.0, 'Mar'),
-], '#f39c12');
-
-$chart2->setFormat(ImageFormat::PNG)
-    ->setSize(800, 600)
-    ->setTitle('Sales Comparison')
-    ->setAxisLabel('x', 'Month')
-    ->setAxisLabel('y', 'Sales Units')
-    ->enableGrid()
-    ->enableLegend()
-    ->addDataSeries($sales2023)
-    ->addDataSeries($sales2024);
-
-$barPngPath = $outputDir . '/format_bar.png';
-$chart2->generate($barPngPath);
-echo "✅ Bar chart PNG: {$barPngPath}\n\n";
-
-// Example 3: Scatter chart in WEBP
-echo "Generating scatter chart in WEBP format...\n";
-$chart3 = new Chart(ChartType::Scatter);
-
-$dataset1 = new DataSeries('Dataset A', [
-    new DataPoint(10.0, 15.0),
-    new DataPoint(20.0, 25.0),
-    new DataPoint(30.0, 22.0),
-    new DataPoint(40.0, 35.0),
-    new DataPoint(50.0, 40.0),
-], '#1abc9c');
-
-$dataset2 = new DataSeries('Dataset B', [
-    new DataPoint(15.0, 10.0),
-    new DataPoint(25.0, 18.0),
-    new DataPoint(35.0, 28.0),
-    new DataPoint(45.0, 32.0),
-    new DataPoint(55.0, 45.0),
-], '#e67e22');
-
-$chart3->setFormat(ImageFormat::WEBP)
-    ->setSize(800, 600)
-    ->setTitle('Scientific Data Comparison')
-    ->setAxisLabel('x', 'Variable X')
-    ->setAxisLabel('y', 'Variable Y')
-    ->enableGrid()
-    ->enableLegend()
-    ->addDataSeries($dataset1)
-    ->addDataSeries($dataset2);
-
-$scatterWebpPath = $outputDir . '/format_scatter.webp';
-$chart3->generate($scatterWebpPath);
-echo "✅ Scatter chart WEBP: {$scatterWebpPath}\n\n";
-
-// Example 4: High-resolution PNG chart
-echo "Generating high-resolution chart in PNG format...\n";
-$chart4 = new Chart(ChartType::Line);
-
-$temperature = new DataSeries('Temperature', [
-    new DataPoint(1.0, 15.0),
-    new DataPoint(2.0, 18.0),
-    new DataPoint(3.0, 22.0),
-    new DataPoint(4.0, 20.0),
-    new DataPoint(5.0, 17.0),
-], '#e74c3c');
-
-$chart4->setFormat(ImageFormat::PNG)
-    ->setSize(1920, 1080)  // Full HD resolution
-    ->setTitle('Weekly Temperature')
-    ->setAxisLabel('x', 'Day')
-    ->setAxisLabel('y', 'Temperature (°C)')
-    ->setBackgroundColor('#f8f9fa')
-    ->setAxisColor('#2c3e50')
-    ->enableGrid()
-    ->addDataSeries($temperature);
-
-$hdPngPath = $outputDir . '/format_hd.png';
-$chart4->generate($hdPngPath);
-echo "✅ HD PNG (1920x1080): {$hdPngPath} (" . filesize($hdPngPath) . " bytes)\n\n";
-
-echo "🎉 All format examples generated successfully!\n";
-echo "📁 Check the {$outputDir}/ directory for the output files.\n\n";
-
-// Show format comparison
-echo "Format Size Comparison:\n";
-echo "  PNG (800x600):  " . filesize($pngPath) . " bytes\n";
-echo "  WEBP (800x600): " . filesize($webpPath) . " bytes\n";
-echo "  SVG (800x600):  " . filesize($svgPath) . " bytes\n";
+echo "\n🎉 Format comparison completed!\n";
+echo "📁 Check the {$outputDir}/ directory for output files.\n";
