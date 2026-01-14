@@ -131,4 +131,27 @@ final class MathUtil
 
         return $niceNormalized * $magnitude * ($value < 0 ? -1 : 1);
     }
+
+    /**
+     * Convert polar coordinates to Cartesian coordinates.
+     *
+     * @param float $angleDegrees Angle in degrees (0 = right, 90 = down, 180 = left, 270 = up)
+     * @param float $radius Distance from center
+     * @param float $centerX X coordinate of center point
+     * @param float $centerY Y coordinate of center point
+     * @return array{x: float, y: float} Cartesian coordinates
+     */
+    public static function polarToCartesian(
+        float $angleDegrees,
+        float $radius,
+        float $centerX,
+        float $centerY
+    ): array {
+        $angleRadians = deg2rad($angleDegrees);
+
+        return [
+            'x' => $centerX + ($radius * cos($angleRadians)),
+            'y' => $centerY + ($radius * sin($angleRadians)),
+        ];
+    }
 }

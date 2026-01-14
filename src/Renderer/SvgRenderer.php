@@ -70,11 +70,12 @@ final class SvgRenderer implements RendererInterface
         );
 
         // Render based on chart type
-        match ($type) {
-            ChartType::Line => $svg .= $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
-            ChartType::Bar => $svg .= $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
-            ChartType::Scatter => $svg .= $this->renderScatterChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
-            default => $svg .= $this->renderPlaceholder($type),
+        $svg .= match ($type) {
+            ChartType::Line => $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
+            ChartType::Bar => $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
+            ChartType::Scatter => $this->renderScatterChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
+            ChartType::Pie => $this->renderPieChart($dataSeries, $colorConfig, $dataLabelsEnabled),
+            ChartType::Radar => $this->renderRadarChart($dataSeries, $colorConfig, $axisConfig, $dataLabelsEnabled),
         };
 
         // Render labels
@@ -639,13 +640,6 @@ final class SvgRenderer implements RendererInterface
         return $content;
     }
 
-    private function renderPlaceholder(ChartType $type): string
-    {
-        return sprintf(
-            '<text x="50%%" y="50%%" text-anchor="middle" fill="#333">%s chart (not yet implemented)</text>',
-            $type->value
-        );
-    }
 
     /**
      * Validate data points against axis ranges.
@@ -697,6 +691,292 @@ final class SvgRenderer implements RendererInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param array<DataSeries> $dataSeries
+     */
+    private function renderPieChart(
+        array $dataSeries,
+        ColorConfiguration $colorConfig,
+        bool $dataLabelsEnabled
+    ): string {
+        $content = '';
+
+        if (count($dataSeries) === 0) {
+            return $content;
+        }
+
+        // Pie chart uses first series only
+        $series = $dataSeries[0];
+        $points = $series->getPoints();
+
+        if (count($points) === 0) {
+            return $content;
+        }
+
+        // Calculate center and radius
+        $centerX = $this->width / 2;
+        $centerY = $this->height / 2;
+        $radius = min($this->width, $this->height) * 0.35;
+
+        // Calculate total value
+        $total = 0.0;
+        foreach ($points as $point) {
+            $total += $point->y;
+        }
+
+        if ($total === 0.0) {
+            return $content;
+        }
+
+        // Generate color palette for slices
+        $colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+        ];
+
+        // Draw slices
+        $currentAngle = -90.0; // Start at top (12 o'clock)
+
+        foreach ($points as $index => $point) {
+            $sliceAngle = ($point->y / $total) * 360.0;
+            $endAngle = $currentAngle + $sliceAngle;
+
+            // Use series color if set, otherwise use palette
+            $color = $series->getLineColor() ?? $colors[$index % count($colors)];
+            $fillColor = ColorParser::parse($color);
+
+            // For full circle (single slice), draw a circle
+            if ($sliceAngle >= 359.99) {
+                $content .= sprintf(
+                    '<circle cx="%.2f" cy="%.2f" r="%.2f" fill="rgb(%d,%d,%d)" stroke="#fff" stroke-width="2" />',
+                    $centerX,
+                    $centerY,
+                    $radius,
+                    $fillColor['r'],
+                    $fillColor['g'],
+                    $fillColor['b']
+                );
+            } else {
+                // Calculate arc path
+                $startCoords = MathUtil::polarToCartesian($currentAngle, $radius, $centerX, $centerY);
+                $endCoords = MathUtil::polarToCartesian($endAngle, $radius, $centerX, $centerY);
+
+                $largeArcFlag = $sliceAngle > 180.0 ? 1 : 0;
+
+                $pathData = sprintf(
+                    'M %.2f,%.2f L %.2f,%.2f A %.2f,%.2f 0 %d,1 %.2f,%.2f Z',
+                    $centerX,
+                    $centerY,
+                    $startCoords['x'],
+                    $startCoords['y'],
+                    $radius,
+                    $radius,
+                    $largeArcFlag,
+                    $endCoords['x'],
+                    $endCoords['y']
+                );
+
+                $content .= sprintf(
+                    '<path d="%s" fill="rgb(%d,%d,%d)" stroke="#fff" stroke-width="2" />',
+                    $pathData,
+                    $fillColor['r'],
+                    $fillColor['g'],
+                    $fillColor['b']
+                );
+            }
+
+            // Add data label if enabled
+            if ($dataLabelsEnabled) {
+                $labelAngle = $currentAngle + ($sliceAngle / 2);
+                $labelRadius = $radius * 0.65;
+                $labelCoords = MathUtil::polarToCartesian($labelAngle, $labelRadius, $centerX, $centerY);
+
+                $percentage = ($point->y / $total) * 100;
+                $labelText = $point->label ?? sprintf('%.1f%%', $percentage);
+
+                $content .= sprintf(
+                    '<text x="%.2f" y="%.2f" font-size="12" fill="#fff" text-anchor="middle" dominant-baseline="middle">%s</text>',
+                    $labelCoords['x'],
+                    $labelCoords['y'],
+                    htmlspecialchars($labelText, ENT_XML1, 'UTF-8')
+                );
+            }
+
+            $currentAngle = $endAngle;
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param array<DataSeries> $dataSeries
+     */
+    private function renderRadarChart(
+        array $dataSeries,
+        ColorConfiguration $colorConfig,
+        AxisConfiguration $axisConfig,
+        bool $dataLabelsEnabled
+    ): string {
+        $content = '';
+
+        if (count($dataSeries) === 0) {
+            return $content;
+        }
+
+        // Calculate center and radius
+        $marginTop = 80;
+        $marginBottom = 80;
+        $marginSide = 80;
+
+        $centerX = $this->width / 2;
+        $centerY = $this->height / 2;
+        $maxRadius = min(
+            ($this->width - $marginSide * 2) / 2,
+            ($this->height - $marginTop - $marginBottom) / 2
+        );
+
+        // Get number of axes from first series
+        $firstSeries = $dataSeries[0];
+        $axisCount = count($firstSeries->getPoints());
+
+        if ($axisCount < 3) {
+            return $content;
+        }
+
+        // Calculate data range
+        $allPoints = [];
+        foreach ($dataSeries as $series) {
+            $allPoints = array_merge($allPoints, $series->getPoints());
+        }
+
+        $minValue = $allPoints[0]->y;
+        $maxValue = $allPoints[0]->y;
+        foreach ($allPoints as $point) {
+            $minValue = min($minValue, $point->y);
+            $maxValue = max($maxValue, $point->y);
+        }
+
+        // Apply axis configuration if set
+        if ($axisConfig->hasYRange()) {
+            $minValue = $axisConfig->getYMin() ?? $minValue;
+            $maxValue = $axisConfig->getYMax() ?? $maxValue;
+        }
+
+        $valueRange = $maxValue - $minValue;
+        if ($valueRange === 0.0) {
+            $valueRange = 1.0;
+        }
+
+        // Draw background grid circles
+        $axisColor = ColorParser::parse($colorConfig->getAxisColor());
+        $gridLevels = 5;
+
+        for ($i = 1; $i <= $gridLevels; $i++) {
+            $gridRadius = ($maxRadius / $gridLevels) * $i;
+            $content .= sprintf(
+                '<circle cx="%.2f" cy="%.2f" r="%.2f" fill="none" stroke="rgb(%d,%d,%d)" stroke-width="1" opacity="0.3" />',
+                $centerX,
+                $centerY,
+                $gridRadius,
+                $axisColor['r'],
+                $axisColor['g'],
+                $axisColor['b']
+            );
+        }
+
+        // Draw axis lines and labels
+        $angleStep = 360.0 / $axisCount;
+        $startAngle = -90.0; // Start at top
+
+        for ($i = 0; $i < $axisCount; $i++) {
+            $angle = $startAngle + ($i * $angleStep);
+            $coords = MathUtil::polarToCartesian($angle, $maxRadius, $centerX, $centerY);
+
+            // Draw axis line
+            $content .= sprintf(
+                '<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f" stroke="rgb(%d,%d,%d)" stroke-width="1" opacity="0.5" />',
+                $centerX,
+                $centerY,
+                $coords['x'],
+                $coords['y'],
+                $axisColor['r'],
+                $axisColor['g'],
+                $axisColor['b']
+            );
+
+            // Draw axis label
+            $labelCoords = MathUtil::polarToCartesian($angle, $maxRadius + 20, $centerX, $centerY);
+            $label = $firstSeries->getPoints()[$i]->label ?? "Axis $i";
+
+            $content .= sprintf(
+                '<text x="%.2f" y="%.2f" font-size="12" fill="#333" text-anchor="middle" dominant-baseline="middle">%s</text>',
+                $labelCoords['x'],
+                $labelCoords['y'],
+                htmlspecialchars($label, ENT_XML1, 'UTF-8')
+            );
+        }
+
+        // Draw data series
+        foreach ($dataSeries as $seriesIndex => $series) {
+            $points = $series->getPoints();
+
+            if (count($points) !== $axisCount) {
+                continue; // Skip series with mismatched point count
+            }
+
+            // Build polygon path
+            $polygonPoints = [];
+
+            for ($i = 0; $i < $axisCount; $i++) {
+                $angle = $startAngle + ($i * $angleStep);
+                $normalizedValue = ($points[$i]->y - $minValue) / $valueRange;
+                $pointRadius = $normalizedValue * $maxRadius;
+
+                $coords = MathUtil::polarToCartesian($angle, $pointRadius, $centerX, $centerY);
+                $polygonPoints[] = sprintf('%.2f,%.2f', $coords['x'], $coords['y']);
+            }
+
+            $colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+            ];
+            $color = $series->getLineColor() ?? $colors[$seriesIndex % count($colors)];
+            $lineColor = ColorParser::parse($color);
+
+            // Draw filled polygon with transparency
+            $content .= sprintf(
+                '<polygon points="%s" fill="rgb(%d,%d,%d)" fill-opacity="0.3" stroke="rgb(%d,%d,%d)" stroke-width="2" />',
+                implode(' ', $polygonPoints),
+                $lineColor['r'],
+                $lineColor['g'],
+                $lineColor['b'],
+                $lineColor['r'],
+                $lineColor['g'],
+                $lineColor['b']
+            );
+
+            // Draw points
+            for ($i = 0; $i < $axisCount; $i++) {
+                $angle = $startAngle + ($i * $angleStep);
+                $normalizedValue = ($points[$i]->y - $minValue) / $valueRange;
+                $pointRadius = $normalizedValue * $maxRadius;
+
+                $coords = MathUtil::polarToCartesian($angle, $pointRadius, $centerX, $centerY);
+
+                $content .= sprintf(
+                    '<circle cx="%.2f" cy="%.2f" r="4" fill="rgb(%d,%d,%d)" stroke="#fff" stroke-width="2" />',
+                    $coords['x'],
+                    $coords['y'],
+                    $lineColor['r'],
+                    $lineColor['g'],
+                    $lineColor['b']
+                );
+            }
+        }
+
+        return $content;
     }
 
     /**

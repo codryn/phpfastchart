@@ -87,7 +87,8 @@ final class RasterRenderer implements RendererInterface
             ChartType::Line => $this->renderLineChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
             ChartType::Bar => $this->renderBarChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
             ChartType::Scatter => $this->renderScatterChart($dataSeries, $colorConfig, $gridConfig, $axisConfig, $dataLabelsEnabled),
-            default => $this->renderPlaceholder($type),
+            ChartType::Pie => $this->renderPieChart($dataSeries, $colorConfig, $dataLabelsEnabled),
+            ChartType::Radar => $this->renderRadarChart($dataSeries, $colorConfig, $axisConfig, $dataLabelsEnabled),
         };
 
         // Render labels
@@ -405,11 +406,273 @@ final class RasterRenderer implements RendererInterface
         imagesetthickness($this->image, 1);
     }
 
-    private function renderPlaceholder(ChartType $type): void
-    {
-        $textColor = $this->allocateColor('#999999');
-        $text = "Chart type {$type->value} not yet implemented";
-        imagestring($this->image, 3, (int) ($this->width / 2 - 100), (int) ($this->height / 2), $text, $textColor);
+    /**
+     * @param array<DataSeries> $dataSeries
+     */
+    private function renderPieChart(
+        array $dataSeries,
+        ColorConfiguration $colorConfig,
+        bool $dataLabelsEnabled
+    ): void {
+        if (count($dataSeries) === 0) {
+            return;
+        }
+
+        // Pie chart uses first series only
+        $series = $dataSeries[0];
+        $points = $series->getPoints();
+
+        if (count($points) === 0) {
+            return;
+        }
+
+        // Calculate center and radius
+        $centerX = (int) ($this->width / 2);
+        $centerY = (int) ($this->height / 2);
+        $radius = (int) (min($this->width, $this->height) * 0.35);
+
+        // Calculate total value
+        $total = 0.0;
+        foreach ($points as $point) {
+            $total += $point->y;
+        }
+
+        if ($total === 0.0) {
+            return;
+        }
+
+        // Generate color palette for slices
+        $colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+        ];
+
+        // Draw slices
+        $currentAngle = 270.0; // Start at top (12 o'clock) - GD uses 0 degrees at 3 o'clock
+
+        foreach ($points as $index => $point) {
+            $sliceAngle = ($point->y / $total) * 360.0;
+            $endAngle = $currentAngle + $sliceAngle;
+
+            // Use series color if set, otherwise use palette
+            $colorStr = $series->getLineColor() ?? $colors[$index % count($colors)];
+            $fillColor = $this->allocateColor($colorStr);
+
+            // Draw filled arc (pie slice)
+            if ($sliceAngle >= 359.99) {
+                // Full circle
+                imagefilledellipse($this->image, $centerX, $centerY, $radius * 2, $radius * 2, $fillColor);
+            } else {
+                imagefilledarc(
+                    $this->image,
+                    $centerX,
+                    $centerY,
+                    $radius * 2,
+                    $radius * 2,
+                    (int) $currentAngle,
+                    (int) $endAngle,
+                    $fillColor,
+                    IMG_ARC_PIE
+                );
+            }
+
+            // Draw slice border
+            $white = $this->allocateColor('#FFFFFF');
+            imagearc(
+                $this->image,
+                $centerX,
+                $centerY,
+                $radius * 2,
+                $radius * 2,
+                (int) $currentAngle,
+                (int) $endAngle,
+                $white
+            );
+
+            // Add data label if enabled
+            if ($dataLabelsEnabled) {
+                $labelAngle = $currentAngle + ($sliceAngle / 2);
+                $labelRadius = $radius * 0.65;
+                $labelCoords = MathUtil::polarToCartesian($labelAngle, $labelRadius, (float) $centerX, (float) $centerY);
+
+                $percentage = ($point->y / $total) * 100;
+                $labelText = $point->label ?? sprintf('%.1f%%', $percentage);
+
+                $textColor = $this->allocateColor('#FFFFFF');
+                $textX = (int) ($labelCoords['x'] - (strlen($labelText) * 3));
+                $textY = (int) ($labelCoords['y'] - 4);
+                imagestring($this->image, 2, $textX, $textY, $labelText, $textColor);
+            }
+
+            $currentAngle = $endAngle;
+        }
+    }
+
+    /**
+     * @param array<DataSeries> $dataSeries
+     */
+    private function renderRadarChart(
+        array $dataSeries,
+        ColorConfiguration $colorConfig,
+        AxisConfiguration $axisConfig,
+        bool $dataLabelsEnabled
+    ): void {
+        if (count($dataSeries) === 0) {
+            return;
+        }
+
+        // Calculate center and radius
+        $marginTop = 80;
+        $marginBottom = 80;
+        $marginSide = 80;
+
+        $centerX = (int) ($this->width / 2);
+        $centerY = (int) ($this->height / 2);
+        $maxRadius = (int) min(
+            ($this->width - $marginSide * 2) / 2,
+            ($this->height - $marginTop - $marginBottom) / 2
+        );
+
+        // Get number of axes from first series
+        $firstSeries = $dataSeries[0];
+        $axisCount = count($firstSeries->getPoints());
+
+        if ($axisCount < 3) {
+            return;
+        }
+
+        // Calculate data range
+        $allPoints = [];
+        foreach ($dataSeries as $series) {
+            $allPoints = array_merge($allPoints, $series->getPoints());
+        }
+
+        $minValue = $allPoints[0]->y;
+        $maxValue = $allPoints[0]->y;
+        foreach ($allPoints as $point) {
+            $minValue = min($minValue, $point->y);
+            $maxValue = max($maxValue, $point->y);
+        }
+
+        // Apply axis configuration if set
+        if ($axisConfig->hasYRange()) {
+            $minValue = $axisConfig->getYMin() ?? $minValue;
+            $maxValue = $axisConfig->getYMax() ?? $maxValue;
+        }
+
+        $valueRange = $maxValue - $minValue;
+        if ($valueRange === 0.0) {
+            $valueRange = 1.0;
+        }
+
+        // Draw background grid circles
+        $axisColorStr = $colorConfig->getAxisColor();
+        $axisColor = $this->allocateColor($axisColorStr);
+        $gridLevels = 5;
+
+        for ($i = 1; $i <= $gridLevels; $i++) {
+            $gridRadius = (int) (($maxRadius / $gridLevels) * $i);
+            imageellipse($this->image, $centerX, $centerY, $gridRadius * 2, $gridRadius * 2, $axisColor);
+        }
+
+        // Draw axis lines and labels
+        $angleStep = 360.0 / $axisCount;
+        $startAngle = 270.0; // Start at top (GD uses 0 degrees at 3 o'clock)
+
+        for ($i = 0; $i < $axisCount; $i++) {
+            $angle = $startAngle + ($i * $angleStep);
+            $coords = MathUtil::polarToCartesian($angle, (float) $maxRadius, (float) $centerX, (float) $centerY);
+
+            // Draw axis line
+            imageline(
+                $this->image,
+                $centerX,
+                $centerY,
+                (int) $coords['x'],
+                (int) $coords['y'],
+                $axisColor
+            );
+
+            // Draw axis label
+            $labelCoords = MathUtil::polarToCartesian($angle, $maxRadius + 20.0, (float) $centerX, (float) $centerY);
+            $label = $firstSeries->getPoints()[$i]->label ?? "Axis $i";
+
+            $textColor = $this->allocateColor('#333333');
+            $textX = (int) ($labelCoords['x'] - (strlen($label) * 3));
+            $textY = (int) ($labelCoords['y'] - 4);
+            imagestring($this->image, 2, $textX, $textY, $label, $textColor);
+        }
+
+        // Draw data series
+        foreach ($dataSeries as $seriesIndex => $series) {
+            $points = $series->getPoints();
+
+            if (count($points) !== $axisCount) {
+                continue; // Skip series with mismatched point count
+            }
+
+            // Build polygon points array
+            $polygonPoints = [];
+
+            for ($i = 0; $i < $axisCount; $i++) {
+                $angle = $startAngle + ($i * $angleStep);
+                $normalizedValue = ($points[$i]->y - $minValue) / $valueRange;
+                $pointRadius = $normalizedValue * $maxRadius;
+
+                $coords = MathUtil::polarToCartesian($angle, $pointRadius, (float) $centerX, (float) $centerY);
+                $polygonPoints[] = (int) $coords['x'];
+                $polygonPoints[] = (int) $coords['y'];
+            }
+
+            $colorsArray = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+            ];
+            $colorStr = $series->getLineColor() ?? $colorsArray[$seriesIndex % count($colorsArray)];
+            $lineColor = $this->allocateColor($colorStr);
+
+            // Parse color and create semi-transparent version for fill
+            $rgb = ColorParser::parse($colorStr);
+            $r = max(0, min(255, $rgb['r']));
+            $g = max(0, min(255, $rgb['g']));
+            $b = max(0, min(255, $rgb['b']));
+            $fillColor = imagecolorallocatealpha($this->image, $r, $g, $b, 90);
+
+            // Draw filled polygon
+            if ($fillColor !== false) {
+                imagefilledpolygon($this->image, $polygonPoints, $fillColor);
+            }
+
+            // Draw polygon outline
+            imagepolygon($this->image, $polygonPoints, $lineColor);
+
+            // Draw points
+            for ($i = 0; $i < $axisCount; $i++) {
+                $angle = $startAngle + ($i * $angleStep);
+                $normalizedValue = ($points[$i]->y - $minValue) / $valueRange;
+                $pointRadius = $normalizedValue * $maxRadius;
+
+                $coords = MathUtil::polarToCartesian($angle, $pointRadius, (float) $centerX, (float) $centerY);
+
+                $white = $this->allocateColor('#FFFFFF');
+                imagefilledellipse(
+                    $this->image,
+                    (int) $coords['x'],
+                    (int) $coords['y'],
+                    8,
+                    8,
+                    $lineColor
+                );
+                imageellipse(
+                    $this->image,
+                    (int) $coords['x'],
+                    (int) $coords['y'],
+                    8,
+                    8,
+                    $white
+                );
+            }
+        }
     }
 
     private function renderLabels(?string $title, ?string $xAxisLabel, ?string $yAxisLabel): void

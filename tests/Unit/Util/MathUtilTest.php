@@ -127,4 +127,44 @@ final class MathUtilTest extends TestCase
         $this->assertGreaterThanOrEqual(5000.0, $nice);
         $this->assertLessThanOrEqual(10000.0, $nice);
     }
+
+    public function testPolarToCartesianConvertsAngleAndRadius(): void
+    {
+        // Test 0 degrees (right)
+        $result = MathUtil::polarToCartesian(0.0, 10.0, 0.0, 0.0);
+        $this->assertEqualsWithDelta(10.0, $result['x'], 0.001);
+        $this->assertEqualsWithDelta(0.0, $result['y'], 0.001);
+    }
+
+    public function testPolarToCartesian90Degrees(): void
+    {
+        // Test 90 degrees (down in standard coordinates, up in screen coordinates)
+        $result = MathUtil::polarToCartesian(90.0, 10.0, 0.0, 0.0);
+        $this->assertEqualsWithDelta(0.0, $result['x'], 0.001);
+        $this->assertEqualsWithDelta(10.0, $result['y'], 0.001);
+    }
+
+    public function testPolarToCartesian180Degrees(): void
+    {
+        // Test 180 degrees (left)
+        $result = MathUtil::polarToCartesian(180.0, 10.0, 0.0, 0.0);
+        $this->assertEqualsWithDelta(-10.0, $result['x'], 0.001);
+        $this->assertEqualsWithDelta(0.0, $result['y'], 0.001);
+    }
+
+    public function testPolarToCartesianWithCenterOffset(): void
+    {
+        // Test with non-zero center coordinates
+        $result = MathUtil::polarToCartesian(0.0, 10.0, 50.0, 50.0);
+        $this->assertEqualsWithDelta(60.0, $result['x'], 0.001);
+        $this->assertEqualsWithDelta(50.0, $result['y'], 0.001);
+    }
+
+    public function testPolarToCartesianWithNegativeRadius(): void
+    {
+        // Negative radius should work (pointing opposite direction)
+        $result = MathUtil::polarToCartesian(0.0, -10.0, 0.0, 0.0);
+        $this->assertEqualsWithDelta(-10.0, $result['x'], 0.001);
+        $this->assertEqualsWithDelta(0.0, $result['y'], 0.001);
+    }
 }
