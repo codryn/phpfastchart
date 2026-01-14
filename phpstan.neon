@@ -9,8 +9,6 @@ parameters:
     ignoreErrors:
         # PHPUnit test assertions are acceptable to call dynamically
         - '#Dynamic call to static method PHPUnit\\Framework\\Assert::#'
-        # Format property will be used in future implementations (PNG/WEBP renderers)
-        - '#Property Codryn\\PHPFastChart\\Chart\\Chart::\$format is never read, only written#'
     bootstrapFiles: []
     scanDirectories: []
     reportUnmatchedIgnoredErrors: true

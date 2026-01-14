@@ -18,7 +18,7 @@ use Codryn\PHPFastChart\Util\MathUtil;
 /**
  * SVG renderer for generating charts as SVG XML.
  */
-final class SvgRenderer
+final class SvgRenderer implements RendererInterface
 {
     public function __construct(
         private readonly int $width,

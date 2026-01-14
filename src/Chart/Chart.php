@@ -13,6 +13,7 @@ use Codryn\PHPFastChart\Configuration\LegendConfiguration;
 use Codryn\PHPFastChart\Configuration\LegendPosition;
 use Codryn\PHPFastChart\Data\DataSeries;
 use Codryn\PHPFastChart\Exception\InvalidArgumentException;
+use Codryn\PHPFastChart\Renderer\RasterRenderer;
 use Codryn\PHPFastChart\Renderer\SvgRenderer;
 use Codryn\PHPFastChart\Util\Validator;
 
@@ -303,8 +304,11 @@ final class Chart
             throw new InvalidArgumentException('Chart must have at least one data series');
         }
 
-        // For MVP, only SVG is implemented
-        $renderer = new SvgRenderer($this->width, $this->height);
+        // Choose renderer based on format
+        $renderer = match ($this->format) {
+            ImageFormat::SVG => new SvgRenderer($this->width, $this->height),
+            ImageFormat::PNG, ImageFormat::WEBP => new RasterRenderer($this->width, $this->height, $this->format),
+        };
 
         return $renderer->render(
             $this->type,

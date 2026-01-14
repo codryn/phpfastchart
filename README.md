@@ -65,19 +65,20 @@ $chart->setSize(800, 600)
 
 ## Current Implementation Status
 
-### ✅ Implemented (MVP)
+### ✅ Implemented
 
-- **Foundation**: Exception hierarchy, enums, utilities
-- **Data structures**: DataPoint, DataSeries with validation
+- **Chart types**: Line, Bar, Scatter charts
+- **Output formats**: PNG, WEBP, and SVG
+- **Renderers**: SVG (pure PHP) and Raster (GD library) 
+- **Customization**: Colors, backgrounds, grid lines, legends, axis scaling
+- **Labels & Text**: Chart titles, axis labels, data point labels
+- **Data structures**: DataPoint, DataSeries with immutability
 - **Chart class**: Fluent interface API
-- **SVG renderer**: Line chart rendering with multiple series
-- **File generation**: Save charts to files
-- **Quality gates**: PHPStan level 10, PSR-12, strict types
+- **Quality gates**: PHPStan level 10, PSR-12, strict types, 49%+ test coverage
 
-### 🚧 In Progress
+### 🚧 Future Enhancements
 
-- **PNG/WEBP rendering**: GD-based raster renderer
-- **Bar charts**: Vertical and horizontal bars
+- **Additional chart types**: Pie and Radar charts
 - **Configuration**: Grid lines, axis scaling, labels, legend
 - **Additional chart types**: Pie, Scatter, Radar
 
@@ -114,12 +115,27 @@ composer ci
 See the `examples/` directory for working examples:
 
 - `basic-line-chart.php` - Simple line chart
+- `bar-chart.php` - Bar chart example
+- `scatter-chart-example.php` - Scatter plot
+- `format-comparison.php` - Generate charts in PNG, WEBP, and SVG
+- `custom-colors.php` - Color customization
+- `grid-lines.php` - Grid configuration
+- `labels.php` - Axis labels and titles
+- `legend-example.php` - Legend positioning and styling
+- `axis-scaling.php` - Manual axis ranges
 
 Run examples:
 
 ```bash
+# Run all examples
+composer run-examples
+
+# Or run individual examples
 php examples/basic-line-chart.php
+php examples/format-comparison.php
 ```
+
+**Note**: PNG and WEBP formats require the GD extension. SVG works with pure PHP.
 
 ## Documentation
 
