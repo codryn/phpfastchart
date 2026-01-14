@@ -44,7 +44,7 @@ $chart->setSize(900, 600)
       ->setBackgroundColor('#FFFFFF')
       ->setAxisColor('#333333')
       ->enableGrid()
-      ->setGridColor('#E0E0E0')
+      ->setGridColor('#666666')
       ->addDataSeries($series1)
       ->addDataSeries($series2);
 
@@ -68,7 +68,7 @@ $chart2->setSize(800, 600)
        ->setFormat(ImageFormat::SVG)
        ->setBackgroundColor('#F8F9FA')
        ->enableGrid()
-       ->setGridColor('#CCCCCC')
+       ->setGridColor('#666666')
        ->setGridSpacing(25.0)
        ->addDataSeries($sales);
 

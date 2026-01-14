@@ -91,7 +91,7 @@ $series3 = new DataSeries('Measurements', [
 $chart3->setFormat(ImageFormat::SVG)
     ->setSize(600, 400)
     ->enableGrid()
-    ->setGridColor('#E0E0E0')
+    ->setGridColor('#666666')
     ->addDataSeries($series3);
 
 file_put_contents(__DIR__ . '/output/scatter-with-grid.svg', $chart3->render());
@@ -166,7 +166,7 @@ $chart6->setFormat(ImageFormat::SVG)
     ->setXAxisRange(0.0, 40.0)
     ->setYAxisRange(0.0, 100.0)
     ->enableGrid()
-    ->setGridColor('#DDDDDD')
+    ->setGridColor('#666666')
     ->setBackgroundColor('#FFFFFF')
     ->setAxisColor('#333333')
     ->enableDataLabels()

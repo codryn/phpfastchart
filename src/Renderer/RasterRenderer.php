@@ -454,8 +454,8 @@ final class RasterRenderer implements RendererInterface
             $sliceAngle = ($point->y / $total) * 360.0;
             $endAngle = $currentAngle + $sliceAngle;
 
-            // Use series color if set, otherwise use palette
-            $colorStr = $series->getLineColor() ?? $colors[$index % count($colors)];
+            // Use point color if set, otherwise series color, otherwise palette
+            $colorStr = $point->color ?? $series->getLineColor() ?? $colors[$index % count($colors)];
             $fillColor = $this->allocateColor($colorStr);
 
             // Draw filled arc (pie slice)
@@ -763,7 +763,7 @@ final class RasterRenderer implements RendererInterface
             $yValue = ceil($yMin / $spacing) * $spacing;
 
             while ($yValue <= $yMax) {
-                $y = MathUtil::dataToPixel($yValue, $yMin, $yMax, $this->height - $marginTop - $chartHeight, $marginTop);
+                $y = MathUtil::dataToPixel($yValue, $yMin, $yMax, $this->height - $marginTop, $marginTop);
                 imageline($this->image, $marginLeft, (int) $y, $marginLeft + $chartWidth, (int) $y, $gridColor);
                 $yValue += $spacing;
             }

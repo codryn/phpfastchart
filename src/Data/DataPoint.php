@@ -17,11 +17,13 @@ final readonly class DataPoint
      * @param float $x X-axis value
      * @param float $y Y-axis value
      * @param string|null $label Optional label for this point
+     * @param string|null $color Optional color for this point (hex format like '#FF6384')
      */
     public function __construct(
         public float $x,
         public float $y,
         public ?string $label = null,
+        public ?string $color = null,
     ) {
     }
 }

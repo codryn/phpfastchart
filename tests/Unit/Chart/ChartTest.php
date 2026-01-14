@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for Chart construction and validation.
+ *
+ * @covers \Codryn\PHPFastChart\Chart\Chart
  */
 final class ChartTest extends TestCase
 {

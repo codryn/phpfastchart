@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
  *
  * Note: Pie chart rendering is implemented directly in SvgRenderer
  * rather than in a separate PieChartRenderer class.
+ *
+ * @covers \Codryn\PHPFastChart\Chart\ChartType
  */
 final class PieChartRendererTest extends TestCase
 {

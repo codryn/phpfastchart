@@ -16,16 +16,17 @@ $chart->setSize(800, 600);
 $chart->setFormat(ImageFormat::SVG);
 $chart->setBackgroundColor('#ffffff');
 $chart->setTitle('Market Share by Product');
-$chart->enableLegend();
+$chart->enableDataLabels(); // Show labels on slices instead of legend
 
-// Add data series (pie chart uses first series only)
+// Add data series (pie chart uses first series only, each point is a slice)
+// Each point can have its own color specified as the 4th parameter
 $series = new DataSeries('Products', [
-    new DataPoint(0.0, 350.0, 'Product A'),
-    new DataPoint(1.0, 250.0, 'Product B'),
-    new DataPoint(2.0, 180.0, 'Product C'),
-    new DataPoint(3.0, 120.0, 'Product D'),
-    new DataPoint(4.0, 100.0, 'Product E'),
-], '#FF6384');
+    new DataPoint(0.0, 350.0, 'Product A', '#FF6384'),  // Red/Pink
+    new DataPoint(1.0, 250.0, 'Product B', '#36A2EB'),  // Blue
+    new DataPoint(2.0, 180.0, 'Product C', '#FFCE56'),  // Yellow
+    new DataPoint(3.0, 120.0, 'Product D', '#4BC0C0'),  // Teal
+    new DataPoint(4.0, 100.0, 'Product E', '#9966FF'),  // Purple
+]);
 
 $chart->addDataSeries($series);
 

@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for RasterRenderer (GD-based PNG/WEBP renderer).
+ *
+ * @covers \Codryn\PHPFastChart\Renderer\RasterRenderer
  */
 final class RasterRendererTest extends TestCase
 {

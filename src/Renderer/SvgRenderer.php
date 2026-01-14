@@ -743,8 +743,8 @@ final class SvgRenderer implements RendererInterface
             $sliceAngle = ($point->y / $total) * 360.0;
             $endAngle = $currentAngle + $sliceAngle;
 
-            // Use series color if set, otherwise use palette
-            $color = $series->getLineColor() ?? $colors[$index % count($colors)];
+            // Use point color if set, otherwise series color, otherwise palette
+            $color = $point->color ?? $series->getLineColor() ?? $colors[$index % count($colors)];
             $fillColor = ColorParser::parse($color);
 
             // For full circle (single slice), draw a circle

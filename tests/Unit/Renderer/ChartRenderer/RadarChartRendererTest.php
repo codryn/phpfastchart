@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
  *
  * Note: Radar chart rendering is implemented directly in SvgRenderer
  * rather than in a separate RadarChartRenderer class.
+ *
+ * @covers \Codryn\PHPFastChart\Chart\ChartType
  */
 final class RadarChartRendererTest extends TestCase
 {

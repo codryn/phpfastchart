@@ -156,7 +156,7 @@ $chart6->setSize(800, 600)
     ->setXAxisLabel('Quarter')
     ->setYAxisLabel('Cost ($1000s)')
     ->enableGrid()
-    ->setGridColor('#E0E0E0')
+    ->setGridColor('#666666')
     ->enableDataLabels()
     ->addDataSeries($costs);
 
