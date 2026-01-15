@@ -240,6 +240,10 @@ final class RadarChartTest extends TestCase
 
     public function testRadarChartAsWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Radar);
         $chart->setSize(700, 700);
         $chart->setFormat(ImageFormat::WEBP);

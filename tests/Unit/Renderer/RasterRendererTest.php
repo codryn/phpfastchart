@@ -102,6 +102,10 @@ final class RasterRendererTest extends TestCase
 
     public function testRenderWithWebpFormatProducesWebpData(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $renderer = new RasterRenderer(400, 300, ImageFormat::WEBP);
         $series = new DataSeries('Test', [
             new DataPoint(0.0, 10.0),

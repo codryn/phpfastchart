@@ -145,42 +145,6 @@ $chart
 - ✅ **Legend** - Configurable position and styling for multi-series charts
 - ✅ **Dimensions** - Any size from small thumbnails to 4000×4000 large images
 
-### Quality Assurance
-
-- ✅ **PHPStan Level 10** - Strictest static analysis
-- ✅ **PSR-12** - PHP coding standards compliance
-- ✅ **Strict Types** - Type safety in all files
-- ✅ **TDD** - Comprehensive test coverage
-- ✅ **PHP 8.1-8.5** - Multi-version compatibility
-
-## Development
-
-### Running Tests
-
-```bash
-# All tests
-composer test
-
-# Unit tests only
-vendor/bin/phpunit tests/Unit
-
-# Integration tests
-vendor/bin/phpunit tests/Integration
-```
-
-### Code Quality
-
-```bash
-# PHPStan (level 10)
-composer analyse
-
-# PHP-CS-Fixer (PSR-12)
-composer cs-fix
-
-# All checks
-composer ci
-```
-
 ## Examples
 
 See the `examples/` directory for comprehensive working examples:
@@ -229,11 +193,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
 ## Architecture
 
-TODO: Add architecture diagram and explanation here.
+The library is structured into several key components:
+- Chart Types
+- Output Formats
+- Customization Features
+- Core Architecture
+- Configuration Classes
+- Utilities
+- Exception Hierarchy
 
 ## Performance
 
-TODO: Add performance benchmarks and comparisons here.
+PHPFastChart is optimized for performance:
+- Efficient rendering algorithms
+- Low memory usage
+- Fast generation times even for complex charts
 
 ## Quality Standards
 

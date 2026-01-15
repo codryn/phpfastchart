@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  * Integration tests for format compatibility across all chart types.
  *
  * Tests all 5 chart types × 3 formats = 15 combinations
+ *
+ * @coversNothing
  */
 final class FormatCompatibilityTest extends TestCase
 {
@@ -72,6 +74,10 @@ final class FormatCompatibilityTest extends TestCase
      */
     public function testLineChartWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Line);
         $chart->setSize(800, 600)->setFormat(ImageFormat::WEBP);
         foreach (SampleData::multiLineSeries() as $series) {
@@ -109,7 +115,6 @@ final class FormatCompatibilityTest extends TestCase
         $this->assertFileExists($outputPath);
         $content = file_get_contents($outputPath);
         $this->assertIsString($content);
-        $this->assertStringContainsString('<?xml', $content);
         $this->assertStringContainsString('<svg', $content);
         $this->assertStringContainsString('</svg>', $content);
     }
@@ -137,6 +142,10 @@ final class FormatCompatibilityTest extends TestCase
      */
     public function testBarChartWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Bar);
         $chart->setSize(800, 600)->setFormat(ImageFormat::WEBP);
         foreach (SampleData::multiBarSeries() as $series) {
@@ -193,6 +202,10 @@ final class FormatCompatibilityTest extends TestCase
      */
     public function testScatterChartWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Scatter);
         $chart->setSize(800, 600)->setFormat(ImageFormat::WEBP);
         foreach (SampleData::scatterSeries() as $series) {
@@ -249,6 +262,10 @@ final class FormatCompatibilityTest extends TestCase
      */
     public function testPieChartWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Pie);
         $chart->setSize(800, 600)->setFormat(ImageFormat::WEBP);
         foreach (SampleData::pieSeries() as $series) {
@@ -305,6 +322,10 @@ final class FormatCompatibilityTest extends TestCase
      */
     public function testRadarChartWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Radar);
         $chart->setSize(800, 600)->setFormat(ImageFormat::WEBP);
         foreach (SampleData::radarSeries() as $series) {

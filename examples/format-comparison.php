@@ -18,9 +18,13 @@ if (!is_dir($outputDir)) {
 
 // Check if GD extension is available
 $hasGd = extension_loaded('gd');
+$hasWebp = $hasGd && function_exists('imagewebp');
 if (!$hasGd) {
     echo "ℹ️  GD extension is not loaded. Skipping PNG and WEBP generation.\n";
     echo "   Only SVG format will be generated.\n\n";
+} elseif (!$hasWebp) {
+    echo "ℹ️  imagewebp() function not available. Skipping WEBP generation.\n";
+    echo "   PNG and SVG formats will be generated.\n\n";
 }
 
 echo "📊 Generating charts in multiple formats (PNG, WEBP, SVG)...\n\n";
@@ -54,22 +58,29 @@ if ($hasGd) {
     $pngSize = filesize($pngPath);
     echo "✅ PNG generated: {$pngPath} (" . number_format($pngSize) . " bytes)\n";
 
-    // Generate WEBP
-    $chart->setFormat(ImageFormat::WEBP);
-    $webpPath = $outputDir . '/format_comparison.webp';
-    $chart->generate($webpPath);
-    $webpSize = filesize($webpPath);
-    echo "✅ WEBP generated: {$webpPath} (" . number_format($webpSize) . " bytes)\n\n";
+    if ($hasWebp) {
+        // Generate WEBP
+        $chart->setFormat(ImageFormat::WEBP);
+        $webpPath = $outputDir . '/format_comparison.webp';
+        $chart->generate($webpPath);
+        $webpSize = filesize($webpPath);
+        echo "✅ WEBP generated: {$webpPath} (" . number_format($webpSize) . " bytes)\n\n";
 
-    // Show comparison
-    echo "Format Size Comparison:\n";
-    echo "  PNG (800x600):  " . number_format($pngSize) . " bytes\n";
-    echo "  WEBP (800x600): " . number_format($webpSize) . " bytes\n";
-    echo "  SVG (800x600):  " . number_format($svgSize) . " bytes\n\n";
+        // Show comparison
+        echo "Format Size Comparison:\n";
+        echo "  PNG (800x600):  " . number_format($pngSize) . " bytes\n";
+        echo "  WEBP (800x600): " . number_format($webpSize) . " bytes\n";
+        echo "  SVG (800x600):  " . number_format($svgSize) . " bytes\n\n";
 
-    // Calculate compression ratios
-    $webpSaving = round(((1 - $webpSize / $pngSize) * 100));
-    echo "💡 WEBP is {$webpSaving}% smaller than PNG\n";
+        // Calculate compression ratios
+        $webpSaving = round(((1 - $webpSize / $pngSize) * 100));
+        echo "💡 WEBP is {$webpSaving}% smaller than PNG\n";
+    } else {
+        echo "⏭️  Skipping WEBP generation (imagewebp() function not available)\n\n";
+        echo "Format Size Comparison:\n";
+        echo "  PNG (800x600):  " . number_format($pngSize) . " bytes\n";
+        echo "  SVG (800x600):  " . number_format($svgSize) . " bytes\n";
+    }
 } else {
     echo "⏭️  Skipping PNG generation (GD extension not loaded)\n";
     echo "⏭️  Skipping WEBP generation (GD extension not loaded)\n";

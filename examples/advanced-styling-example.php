@@ -72,17 +72,18 @@ $chartPng = new Chart(ChartType::Line);
 $chartPng
     ->setSize(1200, 800)
     ->setFormat(ImageFormat::PNG)
-    ->addSeries($series1)
-    ->addSeries($series2)
-    ->addSeries($series3)
+    ->addDataSeries($series1)
+    ->addDataSeries($series2)
+    ->addDataSeries($series3)
     ->setBackgroundColor('#F5F5F5')
     ->setTitle('Company Financial Performance')
-    ->setAxisLabel('x', 'Quarter')
-    ->setAxisLabel('y', 'Amount ($1000s)')
-    ->setAxisRange('y', 0, 200)
+    ->setXAxisLabel('Quarter')
+    ->setYAxisLabel('Amount ($1000s)')
+    ->setYAxisRange(0, 200)
     ->enableGrid(true, true)
-    ->setGridStyle('#CCCCCC', 1.0)
-    ->enableLegend(LegendPosition::TopRight)
+    ->setGridColor('#CCCCCC')
+    ->setGridLineWidth(1.0)
+    ->enableLegend(LegendPosition::Right)
     ->generate(__DIR__ . '/output/advanced-styling.png');
 
 echo "   ✓ Generated: output/advanced-styling.png\n";
@@ -96,17 +97,18 @@ $chartSvg = new Chart(ChartType::Line);
 $chartSvg
     ->setSize(1200, 800)
     ->setFormat(ImageFormat::SVG)
-    ->addSeries($series1)
-    ->addSeries($series2)
-    ->addSeries($series3)
+    ->addDataSeries($series1)
+    ->addDataSeries($series2)
+    ->addDataSeries($series3)
     ->setBackgroundColor('#F5F5F5')
     ->setTitle('Company Financial Performance')
-    ->setAxisLabel('x', 'Quarter')
-    ->setAxisLabel('y', 'Amount ($1000s)')
-    ->setAxisRange('y', 0, 200)
+    ->setXAxisLabel('Quarter')
+    ->setYAxisLabel('Amount ($1000s)')
+    ->setYAxisRange(0, 200)
     ->enableGrid(true, true)
-    ->setGridStyle('#CCCCCC', 1.0)
-    ->enableLegend(LegendPosition::TopRight)
+    ->setGridColor('#CCCCCC')
+    ->setGridLineWidth(1.0)
+    ->enableLegend(LegendPosition::Right)
     ->generate(__DIR__ . '/output/advanced-styling.svg');
 
 echo "   ✓ Generated: output/advanced-styling.svg\n";
@@ -129,15 +131,16 @@ $barChart = new Chart(ChartType::Bar);
 $barChart
     ->setSize(1000, 700)
     ->setFormat(ImageFormat::PNG)
-    ->addSeries($barSeries)
+    ->addDataSeries($barSeries)
     ->setBackgroundColor('#FFFFFF')
     ->setTitle('Regional Sales Analysis')
-    ->setAxisLabel('x', 'Region')
-    ->setAxisLabel('y', 'Sales ($1000s)')
-    ->setAxisRange('y', 0, 600)
+    ->setXAxisLabel('Region')
+    ->setYAxisLabel('Sales ($1000s)')
+    ->setYAxisRange(0, 600)
     ->enableGrid(false, true)
-    ->setGridStyle('#E0E0E0', 1.0)
-    ->enableLegend(LegendPosition::TopLeft)
+    ->setGridColor('#E0E0E0')
+    ->setGridLineWidth(1.0)
+    ->enableLegend(LegendPosition::Top)
     ->generate(__DIR__ . '/output/advanced-bar-chart.png');
 
 echo "   ✓ Generated: output/advanced-bar-chart.png\n";
@@ -176,17 +179,18 @@ $scatterChart = new Chart(ChartType::Scatter);
 $scatterChart
     ->setSize(1000, 700)
     ->setFormat(ImageFormat::PNG)
-    ->addSeries($scatterSeries1)
-    ->addSeries($scatterSeries2)
+    ->addDataSeries($scatterSeries1)
+    ->addDataSeries($scatterSeries2)
     ->setBackgroundColor('#FAFAFA')
     ->setTitle('Correlation Analysis')
-    ->setAxisLabel('x', 'Variable X')
-    ->setAxisLabel('y', 'Variable Y')
-    ->setAxisRange('x', 0, 10)
-    ->setAxisRange('y', 0, 10)
+    ->setXAxisLabel('Variable X')
+    ->setYAxisLabel('Variable Y')
+    ->setXAxisRange(0, 10)
+    ->setYAxisRange(0, 10)
     ->enableGrid(true, true)
-    ->setGridStyle('#DDDDDD', 1.0)
-    ->enableLegend(LegendPosition::BottomRight)
+    ->setGridColor('#DDDDDD')
+    ->setGridLineWidth(1.0)
+    ->enableLegend(LegendPosition::Bottom)
     ->generate(__DIR__ . '/output/advanced-scatter-plot.png');
 
 echo "   ✓ Generated: output/advanced-scatter-plot.png\n";
@@ -209,7 +213,7 @@ $pieChart = new Chart(ChartType::Pie);
 $pieChart
     ->setSize(800, 800)
     ->setFormat(ImageFormat::PNG)
-    ->addSeries($pieSeries)
+    ->addDataSeries($pieSeries)
     ->setBackgroundColor('#FFFFFF')
     ->setTitle('Market Share Distribution')
     ->enableLegend(LegendPosition::Right)
@@ -249,13 +253,14 @@ $radarChart = new Chart(ChartType::Radar);
 $radarChart
     ->setSize(800, 800)
     ->setFormat(ImageFormat::PNG)
-    ->addSeries($radarSeries1)
-    ->addSeries($radarSeries2)
+    ->addDataSeries($radarSeries1)
+    ->addDataSeries($radarSeries2)
     ->setBackgroundColor('#F8F9FA')
     ->setTitle('Team Capabilities Comparison')
-    ->setAxisRange('y', 0, 10)
+    ->setYAxisRange(0, 10)
     ->enableGrid(true, false)
-    ->setGridStyle('#CCCCCC', 1.0)
+    ->setGridColor('#CCCCCC')
+    ->setGridLineWidth(1.0)
     ->enableLegend(LegendPosition::Bottom)
     ->generate(__DIR__ . '/output/advanced-radar-chart.png');
 

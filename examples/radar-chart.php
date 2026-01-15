@@ -66,9 +66,13 @@ $chart->generate($outputPath);
 
 echo "Radar chart (PNG) generated: $outputPath\n";
 
-// Generate WEBP version
-$chart->setFormat(ImageFormat::WEBP);
-$outputPath = __DIR__ . '/output/radar-chart.webp';
-$chart->generate($outputPath);
+// Generate WEBP version (if supported)
+if (function_exists('imagewebp')) {
+    $chart->setFormat(ImageFormat::WEBP);
+    $outputPath = __DIR__ . '/output/radar-chart.webp';
+    $chart->generate($outputPath);
 
-echo "Radar chart (WEBP) generated: $outputPath\n";
+    echo "Radar chart (WEBP) generated: $outputPath\n";
+} else {
+    echo "⏭️  Skipping WEBP generation (imagewebp() function not available)\n";
+}

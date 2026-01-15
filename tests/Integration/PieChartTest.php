@@ -202,6 +202,10 @@ final class PieChartTest extends TestCase
 
     public function testPieChartAsWebp(): void
     {
+        if (!function_exists('imagewebp')) {
+            $this->markTestSkipped('imagewebp() function not available');
+        }
+
         $chart = new Chart(ChartType::Pie);
         $chart->setSize(600, 600);
         $chart->setFormat(ImageFormat::WEBP);
