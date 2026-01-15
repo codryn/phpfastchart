@@ -33,6 +33,8 @@ composer require codryn/phpfastchart
 
 ## Quick Start
 
+### Basic Line Chart
+
 ```php
 <?php
 
@@ -45,42 +47,111 @@ use Codryn\PHPFastChart\Data\DataPoint;
 use Codryn\PHPFastChart\Data\DataSeries;
 
 // Create a line chart
-$chart = new Chart(ChartType::Line);
+$chart = new Chart(800, 600, ChartType::Line, ImageFormat::PNG);
 
-// Add data
-$sales = new DataSeries('Monthly Sales', [
-    new DataPoint(1.0, 100.0),
-    new DataPoint(2.0, 150.0),
-    new DataPoint(3.0, 120.0),
-    new DataPoint(4.0, 180.0),
-], '#3498db');
+// Add data series
+$sales = new DataSeries(
+    'Monthly Sales',
+    [
+        new DataPoint(0, 100, 'Jan'),
+        new DataPoint(1, 150, 'Feb'),
+        new DataPoint(2, 120, 'Mar'),
+        new DataPoint(3, 180, 'Apr'),
+    ],
+    '#3498db'
+);
 
 // Configure and generate
-$chart->setSize(800, 600)
-      ->setFormat(ImageFormat::SVG)
-      ->setBackgroundColor('#FFFFFF')
-      ->addDataSeries($sales)
-      ->generate('output/chart.svg');
+$chart
+    ->addSeries($sales)
+    ->setBackgroundColor('#FFFFFF')
+    ->setTitle('Sales Report')
+    ->setAxisLabel('x', 'Month')
+    ->setAxisLabel('y', 'Sales ($)')
+    ->generate('output/chart.png');
 ```
 
-## Current Implementation Status
+### Multi-Series Bar Chart with Legend
 
-### ✅ Implemented
+```php
+$chart = new Chart(1000, 600, ChartType::Bar, ImageFormat::SVG);
 
-- **Chart types**: Line, Bar, Scatter charts
-- **Output formats**: PNG, WEBP, and SVG
-- **Renderers**: SVG (pure PHP) and Raster (GD library) 
-- **Customization**: Colors, backgrounds, grid lines, legends, axis scaling
-- **Labels & Text**: Chart titles, axis labels, data point labels
-- **Data structures**: DataPoint, DataSeries with immutability
-- **Chart class**: Fluent interface API
-- **Quality gates**: PHPStan level 10, PSR-12, strict types, 49%+ test coverage
+$series1 = new DataSeries('Product A', [
+    new DataPoint(0, 50, 'Q1'),
+    new DataPoint(1, 75, 'Q2'),
+    new DataPoint(2, 60, 'Q3'),
+    new DataPoint(3, 90, 'Q4'),
+], '#0066CC');
 
-### 🚧 Future Enhancements
+$series2 = new DataSeries('Product B', [
+    new DataPoint(0, 40, 'Q1'),
+    new DataPoint(1, 65, 'Q2'),
+    new DataPoint(2, 80, 'Q3'),
+    new DataPoint(3, 95, 'Q4'),
+], '#FF6600');
 
-- **Additional chart types**: Pie and Radar charts
-- **Configuration**: Grid lines, axis scaling, labels, legend
-- **Additional chart types**: Pie, Scatter, Radar
+$chart
+    ->addSeries($series1)
+    ->addSeries($series2)
+    ->setTitle('Quarterly Revenue')
+    ->setAxisRange('y', 0, 100)
+    ->enableGrid(false, true)
+    ->enableLegend(\Codryn\PHPFastChart\Configuration\LegendPosition::TopRight)
+    ->generate('output/bar-chart.svg');
+```
+
+### Pie Chart
+
+```php
+$chart = new Chart(800, 800, ChartType::Pie, ImageFormat::PNG);
+
+$marketShare = new DataSeries('Market Share', [
+    new DataPoint(0, 35, 'Product A'),
+    new DataPoint(1, 25, 'Product B'),
+    new DataPoint(2, 20, 'Product C'),
+    new DataPoint(3, 15, 'Product D'),
+    new DataPoint(4, 5, 'Others'),
+], '#0066CC');
+
+$chart
+    ->addSeries($marketShare)
+    ->setTitle('Market Share Distribution')
+    ->enableLegend(\Codryn\PHPFastChart\Configuration\LegendPosition::Right)
+    ->generate('output/pie-chart.png');
+```
+
+## Feature Overview
+
+### Chart Types
+
+- **Line Chart** - Multi-series line graphs with customizable styles
+- **Bar Chart** - Vertical bar charts with grouped series support
+- **Scatter Plot** - X/Y coordinate scatter plots for data distribution
+- **Pie Chart** - Circular percentage charts (single series)
+- **Radar Chart** - Multi-dimensional comparison charts (spider/web charts)
+
+### Output Formats
+
+- **PNG** - High-quality raster images (requires GD extension)
+- **WEBP** - Modern compressed raster format (requires GD extension)
+- **SVG** - Scalable vector graphics (pure PHP, no dependencies)
+
+### Customization Features
+
+- ✅ **Colors** - Customize background, axes, grid, series colors
+- ✅ **Grid Lines** - Horizontal/vertical grid with customizable spacing and style
+- ✅ **Axis Scaling** - Manual or automatic axis ranges with clip modes
+- ✅ **Labels** - Chart titles, axis labels, data point labels
+- ✅ **Legend** - Configurable position and styling for multi-series charts
+- ✅ **Dimensions** - Any size from small thumbnails to 4000×4000 large images
+
+### Quality Assurance
+
+- ✅ **PHPStan Level 10** - Strictest static analysis
+- ✅ **PSR-12** - PHP coding standards compliance
+- ✅ **Strict Types** - Type safety in all files
+- ✅ **TDD** - Comprehensive test coverage
+- ✅ **PHP 8.1-8.5** - Multi-version compatibility
 
 ## Development
 
@@ -112,17 +183,26 @@ composer ci
 
 ## Examples
 
-See the `examples/` directory for working examples:
+See the `examples/` directory for comprehensive working examples:
 
+### Basic Examples
 - `basic-line-chart.php` - Simple line chart
 - `bar-chart.php` - Bar chart example
 - `scatter-chart-example.php` - Scatter plot
+- `pie-chart.php` - Pie chart with percentages
+- `radar-chart.php` - Radar/spider chart
+
+### Feature Examples
 - `format-comparison.php` - Generate charts in PNG, WEBP, and SVG
 - `custom-colors.php` - Color customization
 - `grid-lines.php` - Grid configuration
 - `labels.php` - Axis labels and titles
 - `legend-example.php` - Legend positioning and styling
-- `axis-scaling.php` - Manual axis ranges
+- `axis-scaling.php` - Manual and automatic axis ranges
+
+### Advanced Examples
+- `advanced-styling-example.php` - All features combined
+- `svg-export-example.php` - SVG-specific features and advantages
 
 Run examples:
 
@@ -132,7 +212,7 @@ composer run-examples
 
 # Or run individual examples
 php examples/basic-line-chart.php
-php examples/format-comparison.php
+php examples/advanced-styling-example.php
 ```
 
 **Note**: PNG and WEBP formats require the GD extension. SVG works with pure PHP.
