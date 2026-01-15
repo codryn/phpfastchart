@@ -9,7 +9,7 @@ namespace Codryn\PHPFastChart\Configuration;
  *
  * Immutable value object for grid line settings.
  */
-final readonly class GridConfiguration
+final class GridConfiguration
 {
     /**
      * Create a new grid configuration.
@@ -22,12 +22,12 @@ final readonly class GridConfiguration
      * @param float|null $spacing Grid spacing in data units (null for auto)
      */
     public function __construct(
-        private bool $enabled = false,
-        private bool $showHorizontalLines = true,
-        private bool $showVerticalLines = true,
-        private string $color = '#E0E0E0',
-        private float $lineWidth = 1.0,
-        private ?float $spacing = null,
+        private readonly bool $enabled = false,
+        private readonly bool $showHorizontalLines = true,
+        private readonly bool $showVerticalLines = true,
+        private readonly string $color = '#E0E0E0',
+        private readonly float $lineWidth = 1.0,
+        private readonly ?float $spacing = null,
     ) {
     }
 

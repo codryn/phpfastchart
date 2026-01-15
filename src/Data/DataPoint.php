@@ -9,7 +9,7 @@ namespace Codryn\PHPFastChart\Data;
  *
  * Immutable value object using readonly properties (PHP 8.1+).
  */
-final readonly class DataPoint
+final class DataPoint
 {
     /**
      * Create a new data point.
@@ -20,10 +20,10 @@ final readonly class DataPoint
      * @param string|null $color Optional color for this point (hex format like '#FF6384')
      */
     public function __construct(
-        public float $x,
-        public float $y,
-        public ?string $label = null,
-        public ?string $color = null,
+        public readonly float $x,
+        public readonly float $y,
+        public readonly ?string $label = null,
+        public readonly ?string $color = null,
     ) {
     }
 }

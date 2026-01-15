@@ -9,7 +9,7 @@ namespace Codryn\PHPFastChart\Configuration;
  *
  * Immutable value object using readonly properties.
  */
-final readonly class ColorConfiguration
+final class ColorConfiguration
 {
     /**
      * Create a new color configuration.
@@ -18,8 +18,8 @@ final readonly class ColorConfiguration
      * @param string $axisColor Axis color (hex or named)
      */
     public function __construct(
-        private string $backgroundColor = '#FFFFFF',
-        private string $axisColor = '#333333',
+        private readonly string $backgroundColor = '#FFFFFF',
+        private readonly string $axisColor = '#333333',
     ) {
     }
 

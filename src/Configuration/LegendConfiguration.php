@@ -9,7 +9,7 @@ namespace Codryn\PHPFastChart\Configuration;
  *
  * Provides settings for legend visibility, position, and styling.
  */
-final readonly class LegendConfiguration
+final class LegendConfiguration
 {
     /**
      * @param bool $enabled Whether the legend is displayed
@@ -20,12 +20,12 @@ final readonly class LegendConfiguration
      * @param string $borderColor Border color for legend box
      */
     public function __construct(
-        private bool $enabled = false,
-        private LegendPosition $position = LegendPosition::Right,
-        private int $fontSize = 12,
-        private string $textColor = '#333333',
-        private string $backgroundColor = '#FFFFFF',
-        private string $borderColor = '#CCCCCC'
+        private readonly bool $enabled = false,
+        private readonly LegendPosition $position = LegendPosition::Right,
+        private readonly int $fontSize = 12,
+        private readonly string $textColor = '#333333',
+        private readonly string $backgroundColor = '#FFFFFF',
+        private readonly string $borderColor = '#CCCCCC'
     ) {
     }
 

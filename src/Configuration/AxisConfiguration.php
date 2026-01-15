@@ -12,7 +12,7 @@ use InvalidArgumentException;
  * This immutable value object manages axis min/max values and clip mode.
  * If no range is specified, the chart will auto-scale to fit the data.
  */
-final readonly class AxisConfiguration
+final class AxisConfiguration
 {
     /**
      * Create a new axis configuration.
@@ -24,11 +24,11 @@ final readonly class AxisConfiguration
      * @param AxisClipMode $clipMode How to handle out-of-range data
      */
     public function __construct(
-        private ?float $xMin = null,
-        private ?float $xMax = null,
-        private ?float $yMin = null,
-        private ?float $yMax = null,
-        private AxisClipMode $clipMode = AxisClipMode::Throw
+        private readonly ?float $xMin = null,
+        private readonly ?float $xMax = null,
+        private readonly ?float $yMin = null,
+        private readonly ?float $yMax = null,
+        private readonly AxisClipMode $clipMode = AxisClipMode::Throw
     ) {
     }
 
