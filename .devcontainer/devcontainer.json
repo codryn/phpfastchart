@@ -1,6 +1,8 @@
 {
-	"name": "PHPDice Development Environment",
-	"image": "mcr.microsoft.com/devcontainers/php:1-8.3-bullseye",
+	"name": "PHPFastChart Development Environment",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {}
@@ -28,6 +30,7 @@
 					"dom",
 					"fileinfo",
 					"filter",
+					"gd",
 					"hash",
 					"iconv",
 					"json",
@@ -66,7 +69,7 @@
 		}
 	},
 
-	"postCreateCommand": "bash -c 'php -v && composer --version && git --version'",
+	"postCreateCommand": "bash -c 'php -v && composer --version && git --version && php -m | grep -i gd'",
 
 	"remoteUser": "vscode",
 

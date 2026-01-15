@@ -1,0 +1,18 @@
+parameters:
+    level: 10
+    paths:
+        - src
+        - tests
+    exceptions:
+        implicitThrows: false
+        checkedExceptionClasses: []
+    ignoreErrors:
+        # PHPUnit test assertions are acceptable to call dynamically
+        - '#Dynamic call to static method PHPUnit\\Framework\\Assert::#'
+    bootstrapFiles: []
+    scanDirectories: []
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: true
+
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
