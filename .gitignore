@@ -38,6 +38,3 @@ logs/
 
 # Build artifacts
 dist/
-
-# Example output files
-examples/output/
