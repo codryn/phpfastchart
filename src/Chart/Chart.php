@@ -12,6 +12,7 @@ use Codryn\PHPFastChart\Configuration\ImageFormat;
 use Codryn\PHPFastChart\Configuration\LegendConfiguration;
 use Codryn\PHPFastChart\Configuration\LegendPosition;
 use Codryn\PHPFastChart\Data\DataSeries;
+use Codryn\PHPFastChart\Data\StatisticalOverlay;
 use Codryn\PHPFastChart\Exception\InvalidArgumentException;
 use Codryn\PHPFastChart\Renderer\RasterRenderer;
 use Codryn\PHPFastChart\Renderer\SvgRenderer;
@@ -36,6 +37,9 @@ final class Chart
 
     /** @var array<DataSeries> */
     private array $dataSeries = [];
+
+    /** @var array<StatisticalOverlay> */
+    private array $statisticalOverlays = [];
 
     public function __construct(
         private readonly ChartType $type,
@@ -275,6 +279,30 @@ final class Chart
     }
 
     /**
+     * Add a statistical overlay to the chart.
+     *
+     * Statistical overlays display min, max, average, and standard deviation
+     * as vertical lines with labels over the chart data.
+     *
+     * @param StatisticalOverlay $overlay Statistical overlay to add
+     * @return self For method chaining
+     * @throws InvalidArgumentException If chart type doesn't support overlays (Pie, Radar)
+     */
+    public function addStatisticalOverlay(StatisticalOverlay $overlay): self
+    {
+        // Only allow overlays on X/Y chart types
+        if ($this->type === ChartType::Pie || $this->type === ChartType::Radar) {
+            throw new InvalidArgumentException(
+                "Statistical overlays are only supported for X/Y chart types (Line, Bar, Scatter). " .
+                "Cannot add overlay to {$this->type->value} chart."
+            );
+        }
+
+        $this->statisticalOverlays[] = $overlay;
+        return $this;
+    }
+
+    /**
      * Generate chart and save to file.
      *
      * @param string $outputPath Output file path
@@ -320,7 +348,8 @@ final class Chart
             $this->title,
             $this->xAxisLabel,
             $this->yAxisLabel,
-            $this->dataLabelsEnabled
+            $this->dataLabelsEnabled,
+            $this->statisticalOverlays
         );
     }
 }

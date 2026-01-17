@@ -60,6 +60,7 @@ final class RasterRenderer implements RendererInterface
      * @param string|null $xAxisLabel X-axis label
      * @param string|null $yAxisLabel Y-axis label
      * @param bool $dataLabelsEnabled Whether to show data point labels
+     * @param array<\Codryn\PHPFastChart\Data\StatisticalOverlay> $statisticalOverlays Statistical overlays
      * @return string Binary image data
      */
     public function render(
@@ -72,7 +73,8 @@ final class RasterRenderer implements RendererInterface
         ?string $title = null,
         ?string $xAxisLabel = null,
         ?string $yAxisLabel = null,
-        bool $dataLabelsEnabled = false
+        bool $dataLabelsEnabled = false,
+        array $statisticalOverlays = []
     ): string {
         // Enable alpha blending for transparency
         imagealphablending($this->image, true);
@@ -90,6 +92,11 @@ final class RasterRenderer implements RendererInterface
             ChartType::Pie => $this->renderPieChart($dataSeries, $colorConfig, $dataLabelsEnabled),
             ChartType::Radar => $this->renderRadarChart($dataSeries, $colorConfig, $axisConfig, $dataLabelsEnabled),
         };
+
+        // Render statistical overlays (only for X/Y charts)
+        if (count($statisticalOverlays) > 0 && in_array($type, [ChartType::Line, ChartType::Bar, ChartType::Scatter], true)) {
+            $this->renderStatisticalOverlays($statisticalOverlays, $dataSeries, $axisConfig);
+        }
 
         // Render labels
         $this->renderLabels($title, $xAxisLabel, $yAxisLabel);
@@ -877,6 +884,53 @@ final class RasterRenderer implements RendererInterface
                     throw new InvalidArgumentException("Data point Y value {$y} is above maximum {$maxY}");
                 }
             }
+        }
+    }
+
+    /**
+     * Render statistical overlays as vertical lines with labels.
+     *
+     * @param array<\Codryn\PHPFastChart\Data\StatisticalOverlay> $overlays Statistical overlays to render
+     * @param array<DataSeries> $dataSeries Data series for axis calculations
+     * @param AxisConfiguration $axisConfig Axis configuration
+     */
+    private function renderStatisticalOverlays(
+        array $overlays,
+        array $dataSeries,
+        AxisConfiguration $axisConfig
+    ): void {
+        if (count($overlays) === 0) {
+            return;
+        }
+
+        // Calculate plot area (same as in other render methods)
+        $padding = 80;
+        $plotWidth = $this->width - 2 * $padding;
+        $plotHeight = $this->height - 2 * $padding;
+
+        // Get axis ranges
+        [$xMin, $xMax, $yMin, $yMax] = $this->calculateAxisRanges($dataSeries, $axisConfig);
+
+        foreach ($overlays as $overlay) {
+            $color = $this->allocateColor($overlay->getColor());
+
+            // Render min line
+            $minY = $overlay->getMin();
+            $minScreenY = (int) ($this->height - $padding - (($minY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            imagedashedline($this->image, $padding, $minScreenY, $this->width - $padding, $minScreenY, $color);
+            imagestring($this->image, 3, $this->width - $padding - 80, $minScreenY - 15, sprintf('min=%.2f', $minY), $color);
+
+            // Render max line
+            $maxY = $overlay->getMax();
+            $maxScreenY = (int) ($this->height - $padding - (($maxY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            imagedashedline($this->image, $padding, $maxScreenY, $this->width - $padding, $maxScreenY, $color);
+            imagestring($this->image, 3, $this->width - $padding - 80, $maxScreenY - 15, sprintf('max=%.2f', $maxY), $color);
+
+            // Render average line (solid)
+            $avgY = $overlay->getAverage();
+            $avgScreenY = (int) ($this->height - $padding - (($avgY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            imageline($this->image, $padding, $avgScreenY, $this->width - $padding, $avgScreenY, $color);
+            imagestring($this->image, 3, $this->width - $padding - 80, $avgScreenY - 15, sprintf('avg=%.2f', $avgY), $color);
         }
     }
 }

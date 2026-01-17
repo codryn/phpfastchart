@@ -34,10 +34,12 @@ final class SvgRenderer implements RendererInterface
      * @param ColorConfiguration $colorConfig Color configuration
      * @param GridConfiguration $gridConfig Grid configuration
      * @param AxisConfiguration $axisConfig Axis configuration
+     * @param LegendConfiguration $legendConfig Legend configuration
      * @param string|null $title Chart title
      * @param string|null $xAxisLabel X-axis label
      * @param string|null $yAxisLabel Y-axis label
      * @param bool $dataLabelsEnabled Whether to show data point labels
+     * @param array<\Codryn\PHPFastChart\Data\StatisticalOverlay> $statisticalOverlays Statistical overlays
      * @return string SVG XML content
      */
     public function render(
@@ -50,7 +52,8 @@ final class SvgRenderer implements RendererInterface
         ?string $title = null,
         ?string $xAxisLabel = null,
         ?string $yAxisLabel = null,
-        bool $dataLabelsEnabled = false
+        bool $dataLabelsEnabled = false,
+        array $statisticalOverlays = []
     ): string {
         $svg = sprintf(
             '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">',
@@ -77,6 +80,11 @@ final class SvgRenderer implements RendererInterface
             ChartType::Pie => $this->renderPieChart($dataSeries, $colorConfig, $dataLabelsEnabled),
             ChartType::Radar => $this->renderRadarChart($dataSeries, $colorConfig, $axisConfig, $dataLabelsEnabled),
         };
+
+        // Render statistical overlays (only for X/Y charts)
+        if (count($statisticalOverlays) > 0 && in_array($type, [ChartType::Line, ChartType::Bar, ChartType::Scatter], true)) {
+            $svg .= $this->renderStatisticalOverlays($statisticalOverlays, $dataSeries, $axisConfig);
+        }
 
         // Render labels
         $svg .= $this->renderLabels($title, $xAxisLabel, $yAxisLabel);
@@ -1126,6 +1134,100 @@ final class SvgRenderer implements RendererInterface
 
             $itemY += $itemHeight;
         }
+
+        return $content;
+    }
+
+    /**
+     * Render statistical overlays as vertical lines with labels.
+     *
+     * @param array<\Codryn\PHPFastChart\Data\StatisticalOverlay> $overlays Statistical overlays to render
+     * @param array<DataSeries> $dataSeries Data series for axis calculations
+     * @param AxisConfiguration $axisConfig Axis configuration
+     * @return string SVG content for overlays
+     */
+    private function renderStatisticalOverlays(
+        array $overlays,
+        array $dataSeries,
+        AxisConfiguration $axisConfig
+    ): string {
+        if (count($overlays) === 0) {
+            return '';
+        }
+
+        $content = '<g id="statistical-overlays">';
+
+        // Calculate plot area (same as in other render methods)
+        $padding = 80;
+        $plotWidth = $this->width - 2 * $padding;
+        $plotHeight = $this->height - 2 * $padding;
+
+        // Get axis ranges
+        [$xMin, $xMax, $yMin, $yMax] = $this->calculateAxisRanges($dataSeries, $axisConfig);
+
+        foreach ($overlays as $overlay) {
+            $color = ColorParser::parse($overlay->getColor());
+            $colorStr = sprintf('rgb(%d,%d,%d)', $color['r'], $color['g'], $color['b']);
+
+            // Render min line
+            $minY = $overlay->getMin();
+            $minScreenY = $this->height - $padding - (($minY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $content .= sprintf(
+                '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" stroke-dasharray="5,5" />',
+                $padding,
+                $minScreenY,
+                $this->width - $padding,
+                $minScreenY,
+                $colorStr
+            );
+            $content .= sprintf(
+                '<text x="%d" y="%.2f" font-size="12" fill="%s" text-anchor="end">min=%.2f</text>',
+                $this->width - $padding - 5,
+                $minScreenY - 5,
+                $colorStr,
+                $minY
+            );
+
+            // Render max line
+            $maxY = $overlay->getMax();
+            $maxScreenY = $this->height - $padding - (($maxY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $content .= sprintf(
+                '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" stroke-dasharray="5,5" />',
+                $padding,
+                $maxScreenY,
+                $this->width - $padding,
+                $maxScreenY,
+                $colorStr
+            );
+            $content .= sprintf(
+                '<text x="%d" y="%.2f" font-size="12" fill="%s" text-anchor="end">max=%.2f</text>',
+                $this->width - $padding - 5,
+                $maxScreenY - 5,
+                $colorStr,
+                $maxY
+            );
+
+            // Render average line
+            $avgY = $overlay->getAverage();
+            $avgScreenY = $this->height - $padding - (($avgY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $content .= sprintf(
+                '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" />',
+                $padding,
+                $avgScreenY,
+                $this->width - $padding,
+                $avgScreenY,
+                $colorStr
+            );
+            $content .= sprintf(
+                '<text x="%d" y="%.2f" font-size="12" fill="%s" text-anchor="end">avg=%.2f</text>',
+                $this->width - $padding - 5,
+                $avgScreenY - 5,
+                $colorStr,
+                $avgY
+            );
+        }
+
+        $content .= '</g>';
 
         return $content;
     }
