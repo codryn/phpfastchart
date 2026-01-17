@@ -908,27 +908,42 @@ final class RasterRenderer implements RendererInterface
         $plotWidth = $this->width - 2 * $padding;
         $plotHeight = $this->height - 2 * $padding;
 
-        // Get axis ranges
-        [$xMin, $xMax, $yMin, $yMax] = $this->calculateAxisRanges($dataSeries, $axisConfig);
+        // Collect all data points for bounds calculation
+        $allPoints = [];
+        foreach ($dataSeries as $series) {
+            $allPoints = array_merge($allPoints, $series->getPoints());
+        }
+
+        if (count($allPoints) === 0) {
+            return;
+        }
+
+        // Calculate bounds
+        [$xMin, $xMax, $yMin, $yMax] = $this->calculateBounds($allPoints, $axisConfig);
+
+        $rangeY = $yMax - $yMin;
+        if ($rangeY === 0.0) {
+            $rangeY = 1.0;
+        }
 
         foreach ($overlays as $overlay) {
             $color = $this->allocateColor($overlay->getColor());
 
             // Render min line
             $minY = $overlay->getMin();
-            $minScreenY = (int) ($this->height - $padding - (($minY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            $minScreenY = (int) ($this->height - $padding - (($minY - $yMin) / $rangeY) * $plotHeight);
             imagedashedline($this->image, $padding, $minScreenY, $this->width - $padding, $minScreenY, $color);
             imagestring($this->image, 3, $this->width - $padding - 80, $minScreenY - 15, sprintf('min=%.2f', $minY), $color);
 
             // Render max line
             $maxY = $overlay->getMax();
-            $maxScreenY = (int) ($this->height - $padding - (($maxY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            $maxScreenY = (int) ($this->height - $padding - (($maxY - $yMin) / $rangeY) * $plotHeight);
             imagedashedline($this->image, $padding, $maxScreenY, $this->width - $padding, $maxScreenY, $color);
             imagestring($this->image, 3, $this->width - $padding - 80, $maxScreenY - 15, sprintf('max=%.2f', $maxY), $color);
 
             // Render average line (solid)
             $avgY = $overlay->getAverage();
-            $avgScreenY = (int) ($this->height - $padding - (($avgY - $yMin) / ($yMax - $yMin)) * $plotHeight);
+            $avgScreenY = (int) ($this->height - $padding - (($avgY - $yMin) / $rangeY) * $plotHeight);
             imageline($this->image, $padding, $avgScreenY, $this->width - $padding, $avgScreenY, $color);
             imagestring($this->image, 3, $this->width - $padding - 80, $avgScreenY - 15, sprintf('avg=%.2f', $avgY), $color);
         }

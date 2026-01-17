@@ -1162,8 +1162,33 @@ final class SvgRenderer implements RendererInterface
         $plotWidth = $this->width - 2 * $padding;
         $plotHeight = $this->height - 2 * $padding;
 
-        // Get axis ranges
-        [$xMin, $xMax, $yMin, $yMax] = $this->calculateAxisRanges($dataSeries, $axisConfig);
+        // Collect all data points for bounds calculation
+        $allPoints = [];
+        foreach ($dataSeries as $series) {
+            $allPoints = array_merge($allPoints, $series->getPoints());
+        }
+
+        if (count($allPoints) === 0) {
+            return '';
+        }
+
+        // Calculate bounds with axis ranges or auto-scale (same logic as renderLineChart)
+        if ($axisConfig->hasYRange()) {
+            $yMin = $axisConfig->getYMin() ?? 0.0;
+            $yMax = $axisConfig->getYMax() ?? 1.0;
+        } else {
+            $yMin = $allPoints[0]->y;
+            $yMax = $allPoints[0]->y;
+            foreach ($allPoints as $point) {
+                $yMin = min($yMin, $point->y);
+                $yMax = max($yMax, $point->y);
+            }
+        }
+
+        $rangeY = $yMax - $yMin;
+        if ($rangeY === 0.0) {
+            $rangeY = 1.0;
+        }
 
         foreach ($overlays as $overlay) {
             $color = ColorParser::parse($overlay->getColor());
@@ -1171,7 +1196,7 @@ final class SvgRenderer implements RendererInterface
 
             // Render min line
             $minY = $overlay->getMin();
-            $minScreenY = $this->height - $padding - (($minY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $minScreenY = $this->height - $padding - (($minY - $yMin) / $rangeY) * $plotHeight;
             $content .= sprintf(
                 '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" stroke-dasharray="5,5" />',
                 $padding,
@@ -1190,7 +1215,7 @@ final class SvgRenderer implements RendererInterface
 
             // Render max line
             $maxY = $overlay->getMax();
-            $maxScreenY = $this->height - $padding - (($maxY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $maxScreenY = $this->height - $padding - (($maxY - $yMin) / $rangeY) * $plotHeight;
             $content .= sprintf(
                 '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" stroke-dasharray="5,5" />',
                 $padding,
@@ -1209,7 +1234,7 @@ final class SvgRenderer implements RendererInterface
 
             // Render average line
             $avgY = $overlay->getAverage();
-            $avgScreenY = $this->height - $padding - (($avgY - $yMin) / ($yMax - $yMin)) * $plotHeight;
+            $avgScreenY = $this->height - $padding - (($avgY - $yMin) / $rangeY) * $plotHeight;
             $content .= sprintf(
                 '<line x1="%d" y1="%.2f" x2="%d" y2="%.2f" stroke="%s" stroke-width="2" />',
                 $padding,
