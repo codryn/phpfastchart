@@ -293,7 +293,7 @@ final class Chart
         // Only allow overlays on X/Y chart types
         if ($this->type === ChartType::Pie || $this->type === ChartType::Radar) {
             throw new InvalidArgumentException(
-                "Statistical overlays are only supported for X/Y chart types (Line, Bar, Scatter). " .
+                'Statistical overlays are only supported for X/Y chart types (Line, Bar, Scatter). ' .
                 "Cannot add overlay to {$this->type->value} chart."
             );
         }
