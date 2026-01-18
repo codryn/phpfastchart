@@ -28,6 +28,7 @@ interface RendererInterface
      * @param string|null $xAxisLabel X-axis label
      * @param string|null $yAxisLabel Y-axis label
      * @param bool $dataLabelsEnabled Whether data labels are enabled
+     * @param array<\Codryn\PHPFastChart\Data\StatisticalOverlay> $statisticalOverlays Statistical overlays to render
      * @return string Rendered chart content (SVG XML or binary image data)
      */
     public function render(
@@ -40,6 +41,7 @@ interface RendererInterface
         ?string $title,
         ?string $xAxisLabel,
         ?string $yAxisLabel,
-        bool $dataLabelsEnabled
+        bool $dataLabelsEnabled,
+        array $statisticalOverlays = []
     ): string;
 }
